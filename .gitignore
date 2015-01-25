@@ -17,3 +17,6 @@ hs_err_pid*
 .idea/tasks.xml
 *.iws
 out/*
+
+# MySQL Database Credentials
+DatabaseCredentials.java
