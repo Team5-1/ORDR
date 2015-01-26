@@ -27,9 +27,7 @@ public class Item extends ORDRSQLObject {
         this.description = description;
     }
 
-    private Item() {
-
-    }
+    private Item() {}
 
     public static ArrayList<Item> fetchAllItems() {
         ResultSet results = fetchAllObjectsOfClass(Item.class);

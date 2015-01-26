@@ -1,6 +1,5 @@
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Created by kylejm on 26/01/15.
