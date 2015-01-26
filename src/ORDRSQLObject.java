@@ -21,4 +21,6 @@ public abstract class ORDRSQLObject {
         return null;
     }
 
+    abstract public Boolean hasChanges();
+
 }
