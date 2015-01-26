@@ -1,4 +1,5 @@
 import javax.swing.plaf.nimbus.State;
+import javax.xml.crypto.Data;
 import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -10,6 +11,8 @@ import java.util.ArrayList;
  * Created by kylejm on 24/01/15.
  */
 public class DatabaseManager {
+    static final DatabaseManager sharedManager = new DatabaseManager();
+
     private Connection dbConnection;
 
     public DatabaseManager() {
@@ -30,14 +33,10 @@ public class DatabaseManager {
         }
     }
 
-    public ArrayList<Item> fetchAllItems() throws SQLException {
+    public ResultSet fetchAllRowsForTable(String tableName) throws SQLException {
         java.sql.Statement stm = dbConnection.createStatement();
-        ResultSet results = stm.executeQuery("SELECT * FROM Items");
-        ArrayList<Item> items = new ArrayList<Item>(results.getFetchSize());
-        while (results.next()) {
-            items.add(new Item((String) results.getObject("name")));
-        }
-        return items;
+        ResultSet results = stm.executeQuery("SELECT * FROM " + tableName);
+        return results;
     }
 
     private void handleExcetion(SQLException e) {
