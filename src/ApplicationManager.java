@@ -13,11 +13,20 @@ public class ApplicationManager {
 //        vc.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        vc.setVisible(true);
         DatabaseManager manager = new DatabaseManager();
-        ArrayList<Item> items = Item.fetchAllItems();
-        for (Item item : items) {
-            System.out.printf("%d\n", item.getID());
-            System.out.println(item.getName());
-            System.out.println(item.getDescription());
-        }
+        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
+            @Override
+            public void success(ArrayList<Item> items) {
+                for (Item item : items) {
+                    System.out.printf("%d\n", item.getID());
+                    System.out.println(item.getName());
+                    System.out.println(item.getDescription());
+                }
+            }
+
+            @Override
+            public void failed(SQLException exception) {
+
+            }
+        });
     }
 }

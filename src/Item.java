@@ -29,24 +29,28 @@ public class Item extends SQLObject {
 
     private Item() {}
 
-    public static ArrayList<Item> fetchAllItems() {
-        ResultSet results = fetchAllObjectsOfClass(Item.class);
-        ArrayList<Item> items = new ArrayList<Item>();
-        try {
-            while (results.next()) {
-                Item item = new Item();
-                item.ID = results.getInt("item_id");
-                item.fetchedName = results.getString("name");
-                item.fetchedDescription = results.getString("description");
-                item.fetchedPrice = results.getDouble("price");
-                item.fetchedStockQty = results.getInt("stock_qty");
-                items.add(item);
+    public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
+        BackgroundQueue.sharedBackgroundQueue.addToQueue(new Runnable() {
+            @Override
+            public void run() {
+                ResultSet results = fetchAllObjectsOfClass(Item.class);
+                ArrayList<Item> items = new ArrayList<Item>();
+                try {
+                    while (results.next()) {
+                        Item item = new Item();
+                        item.ID = results.getInt("item_id");
+                        item.fetchedName = results.getString("name");
+                        item.fetchedDescription = results.getString("description");
+                        item.fetchedPrice = results.getDouble("price");
+                        item.fetchedStockQty = results.getInt("stock_qty");
+                        items.add(item);
+                    }
+                    handler.success(items);
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
             }
-            return items;
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
-        return null;
+        });
     }
 
     @Override
@@ -92,5 +96,17 @@ public class Item extends SQLObject {
 
     public void setStockQty(Integer stockQty) {
         this.stockQty = stockQty;
+    }
+
+
+    //Item completion handler
+    public interface SingleItemCompletionHandler {
+        public void success(Item item);
+        public void failed(SQLException exception);
+    }
+
+    public interface MultipleItemCompletionHandler {
+        public void success(ArrayList<Item> items);
+        public void failed(SQLException exception);
     }
 }
