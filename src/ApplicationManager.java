@@ -12,10 +12,9 @@ public class ApplicationManager {
 //        vc.setTitle("Add Product");
 //        vc.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 //        vc.setVisible(true);
-        DatabaseManager manager = new DatabaseManager();
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
             @Override
-            public void success(ArrayList<Item> items) {
+            public void succeeded(ArrayList<Item> items) {
                 for (Item item : items) {
                     System.out.printf("%d\n", item.getID());
                     System.out.println(item.getName());

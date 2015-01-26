@@ -30,10 +30,9 @@ public class Item extends SQLObject {
     private Item() {}
 
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
-        BackgroundQueue.sharedBackgroundQueue.addToQueue(new Runnable() {
+        fetchAllObjectsOfClassInBackground(Item.class, new DatabaseManager.SQLCompletionHandler() {
             @Override
-            public void run() {
-                ResultSet results = fetchAllObjectsOfClass(Item.class);
+            public void succeeded(ResultSet results) {
                 ArrayList<Item> items = new ArrayList<Item>();
                 try {
                     while (results.next()) {
@@ -45,10 +44,14 @@ public class Item extends SQLObject {
                         item.fetchedStockQty = results.getInt("stock_qty");
                         items.add(item);
                     }
-                    handler.success(items);
+                    handler.succeeded(items);
                 } catch (SQLException e) {
                     handler.failed(e);
                 }
+            }
+            @Override
+            public void failed(SQLException exception) {
+                handler.failed(exception);
             }
         });
     }
@@ -106,7 +109,7 @@ public class Item extends SQLObject {
     }
 
     public interface MultipleItemCompletionHandler {
-        public void success(ArrayList<Item> items);
+        public void succeeded(ArrayList<Item> items);
         public void failed(SQLException exception);
     }
 }

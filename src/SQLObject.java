@@ -1,3 +1,4 @@
+import javax.xml.crypto.Data;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -10,14 +11,9 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static ResultSet fetchAllObjectsOfClass(Class<? extends SQLObject> classEntity) {
+    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> classEntity, DatabaseManager.SQLCompletionHandler handler) {
         String className = classEntity.getName();
-        try {
-            return DatabaseManager.sharedManager.fetchAllRowsForTable(className + "s");
-        } catch (SQLException e) {
-            handleSQLException(e);
-        }
-        return null;
+        DatabaseManager.sharedManager.fetchAllRowsForTableInBackground(className + "s", handler);
     }
 
     abstract public Boolean hasChanges();

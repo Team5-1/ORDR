@@ -1,11 +1,7 @@
-import javax.swing.plaf.nimbus.State;
-import javax.xml.crypto.Data;
-import java.beans.Statement;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Created by kylejm on 24/01/15.
@@ -33,15 +29,29 @@ public class DatabaseManager {
         }
     }
 
-    public ResultSet fetchAllRowsForTable(String tableName) throws SQLException {
-        java.sql.Statement stm = dbConnection.createStatement();
-        ResultSet results = stm.executeQuery("SELECT * FROM " + tableName);
-        return results;
+    public void fetchAllRowsForTableInBackground(final String tableName, final SQLCompletionHandler handler) {
+        BackgroundQueue.sharedBackgroundQueue.addToQueue(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    java.sql.Statement stm = dbConnection.createStatement();
+                    ResultSet results = stm.executeQuery("SELECT * FROM " + tableName);
+                    handler.succeeded(results);
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+        });
     }
 
     private void handleExcetion(SQLException e) {
         System.out.println("ERROR: MySQL Connection Failed!");
         e.printStackTrace();
+    }
+
+    public interface SQLCompletionHandler {
+        public void succeeded(ResultSet results);
+        public void failed(SQLException exception);
     }
 }
 
