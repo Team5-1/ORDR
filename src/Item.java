@@ -6,7 +6,7 @@ import java.util.ArrayList;
  * Created by kylejm on 25/01/15.
  */
 
-public class Item extends ORDRSQLObject {
+public class Item extends SQLObject {
     //Fetched DB fields
     private String fetchedName;
     private String fetchedDescription;

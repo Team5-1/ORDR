@@ -1,11 +1,7 @@
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-
 /**
  * Created by kylejm on 25/01/15.
  */
-public class User extends ORDRSQLObject {
+public class User extends SQLObject {
     //Fetched DB fields
     private String fetchedUsername;
     private String fetchedFirstName;
