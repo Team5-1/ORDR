@@ -11,21 +11,17 @@ public class DatabaseManager {
     private Connection dbConnection;
 
     public DatabaseManager() {
-        try            // initialise the JDBC driver, with a check for it working
-        {
-            Class.forName("com.mysql.jdbc.Driver");
-        } catch (ClassNotFoundException e)
-        {
+        try {
+            Class.forName("com.mysql.jdbc.Driver"); // initialise the JDBC driver, with a check for it working
+            this.dbConnection = DriverManager.getConnection(DatabaseCredentials.localURL, DatabaseCredentials.localUsername, DatabaseCredentials.localPassword);
+        } catch (ClassNotFoundException e) {
             System.out.println("ERROR: MySQL JDBC Driver not found; is your CLASSPATH set?");
             e.printStackTrace();
-            return;
-        }
-        try {
-            this.dbConnection = DriverManager.getConnection(DatabaseCredentials.localURL, DatabaseCredentials.localUsername, DatabaseCredentials.localPassword);
         } catch (SQLException e) {
             System.out.println("ERROR: MySQL Connection Failed!");
             e.printStackTrace();
         }
+        
     }
 
     public static  void fetchAllRowsForTableInBackground(final String tableName, final SQLQueryCompletionHandler handler) {
