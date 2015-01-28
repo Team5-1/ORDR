@@ -29,10 +29,10 @@ public class BackgroundQueue implements Runnable {
         }
     }
 
-    public void addToQueue(Runnable runnable) {
-        queue.offer(runnable);
-        synchronized (queue) {
-            queue.notifyAll();
+    public static void addToQueue(Runnable runnable) {
+        sharedBackgroundQueue.queue.offer(runnable);
+        synchronized (sharedBackgroundQueue.queue) {
+            sharedBackgroundQueue.queue.notifyAll();
         }
     }
 }

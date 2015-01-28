@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 /**
  * Created by kylejm on 28/11/14.
@@ -20,6 +21,21 @@ public class ApplicationManager {
                     System.out.println(item.getName());
                     System.out.println(item.getDescription());
                 }
+                Scanner scanner = new Scanner(System.in);
+                Integer newStock = Integer.parseInt(scanner.nextLine());
+                Item item = items.get(0);
+                item.setStockQty(newStock);
+                item.save(new DatabaseManager.SQLSaveCompletionHandler() {
+                    @Override
+                    public void succeeded() {
+                        System.out.print("YAY!");
+                    }
+
+                    @Override
+                    public void failed(SQLException exception) {
+                        System.out.print("BOO!");
+                    }
+                });
             }
 
             @Override

@@ -25,6 +25,11 @@ public class User extends SQLObject {
     private User() {}
 
     @Override
+    public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
+
+    }
+
+    @Override
     public Boolean hasChanges() {
         return (username != null || firstName != null || lastName != null);
     }

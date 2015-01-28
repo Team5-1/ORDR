@@ -9,11 +9,13 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> classEntity, DatabaseManager.SQLCompletionHandler handler) {
-        String className = classEntity.getName();
-        DatabaseManager.sharedManager.fetchAllRowsForTableInBackground(className + "s", handler);
+    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> classEntity, DatabaseManager.SQLQueryCompletionHandler handler) {
+        String tableName = classEntity.getName() + "s";
+        DatabaseManager.fetchAllRowsForTableInBackground(tableName, handler);
     }
 
+    //NEXT TODO: add method that returns hashmap of changes and column names
+    abstract public void save(DatabaseManager.SQLSaveCompletionHandler handler);
     abstract public Boolean hasChanges();
 
 }
