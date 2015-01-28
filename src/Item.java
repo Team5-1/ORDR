@@ -67,42 +67,43 @@ public class Item extends SQLObject {
 
     @Override
     public void save(final DatabaseManager.SQLSaveCompletionHandler handler) {
-        if (hasChanges()) {
-            String tableName = getClass().getName() + "s";
-            HashMap<String, Object> changes  = new HashMap<String, Object>();
-            if (name != null) changes.put(kNAME_COLUMN_NAME, name);
-            if (description != null) changes.put(kDESCRIPTION_COLUMN_NAME, description);
-            if (price != null) changes.put(kPRICE_COLUMN_NAME, price);
-            if (stockQty!= null) changes.put(kSTOCK_COLUMN_NAME, stockQty);
-            DatabaseManager.updateFieldsForRecord(tableName, kID_COLUMN_NAME, ID, changes, new DatabaseManager.SQLSaveCompletionHandler() {
-                @Override
-                public void succeeded() {
-                    if (name != null) {
-                        fetchedName = name;
-                        name = null;
-                    }
-                    if (description != null) {
-                        fetchedDescription = description;
-                        description = null;
-                    }
-                    if (price != null) {
-                        fetchedPrice = price;
-                        price = null;
-                    }
-                    if (stockQty!= null) {
-                        fetchedStockQty = stockQty;
-                        stockQty = null;
-                    }
-                    handler.succeeded();
+        super.save(new DatabaseManager.SQLSaveCompletionHandler() {
+            @Override
+            public void succeeded() {
+                if (name != null) {
+                    fetchedName = name;
+                    name = null;
                 }
-                @Override
-                public void failed(SQLException exception) {
-                    handler.failed(exception);
+                if (description != null) {
+                    fetchedDescription = description;
+                    description = null;
                 }
-            });
-        } else {
-            handler.succeeded(); //TODO: Maybe a different method should be called on the handler here (didNotNeedSaving)
-        }
+                if (price != null) {
+                    fetchedPrice = price;
+                    price = null;
+                }
+                if (stockQty!= null) {
+                    fetchedStockQty = stockQty;
+                    stockQty = null;
+                }
+                handler.succeeded();
+            }
+
+            @Override
+            public void failed(SQLException exception) {
+                handler.failed(exception);
+            }
+        });
+    }
+
+    @Override
+    public HashMap<String, Object> changes() {
+        HashMap<String, Object> changes  = new HashMap<String, Object>();
+        if (name != null) changes.put(kNAME_COLUMN_NAME, name);
+        if (description != null) changes.put(kDESCRIPTION_COLUMN_NAME, description);
+        if (price != null) changes.put(kPRICE_COLUMN_NAME, price);
+        if (stockQty!= null) changes.put(kSTOCK_COLUMN_NAME, stockQty);
+        return changes;
     }
 
     @Override
@@ -112,6 +113,13 @@ public class Item extends SQLObject {
 
 
     //Getter methods
+
+
+    @Override
+    public String getIDColumnName() {
+        return kID_COLUMN_NAME;
+    }
+
     public int getID() {
         return ID;
     }

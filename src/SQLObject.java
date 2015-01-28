@@ -1,4 +1,5 @@
 import java.sql.SQLException;
+import java.util.HashMap;
 
 /**
  * Created by kylejm on 26/01/15.
@@ -14,8 +15,19 @@ public abstract class SQLObject {
         DatabaseManager.fetchAllRowsForTableInBackground(tableName, handler);
     }
 
-    //NEXT TODO: add method that returns hashmap of changes and column names
-    abstract public void save(DatabaseManager.SQLSaveCompletionHandler handler);
+    public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
+        if (hasChanges()) {
+            String tableName = getClass().getName() + "s";
+            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes(), handler);
+        } else {
+            handler.succeeded();
+        }
+    }
+
+    abstract public HashMap<String, Object> changes();
     abstract public Boolean hasChanges();
+
+    abstract public String getIDColumnName();
+    abstract public int getID();
 
 }
