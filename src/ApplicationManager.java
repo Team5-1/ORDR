@@ -22,9 +22,9 @@ public class ApplicationManager {
                     System.out.println(item.getDescription());
                 }
                 Scanner scanner = new Scanner(System.in);
-                Integer newStock = Integer.parseInt(scanner.nextLine());
+                String newName = scanner.nextLine();
                 Item item = items.get(0);
-                item.setStockQty(newStock);
+                item.setName(newName);
                 item.save(new DatabaseManager.SQLSaveCompletionHandler() {
                     @Override
                     public void succeeded() {

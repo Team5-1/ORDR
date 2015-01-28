@@ -50,19 +50,20 @@ public class DatabaseManager {
                     HashMap<Integer, Object> keyValueOrder = new HashMap<Integer, Object>(columnsAndValues.size());
                     for (String key : columnsAndValues.keySet()) {
                         stmString = stmString + key + " = ?";
-                        if (i > 0 && i != keyValueQty - 1) stmString = stmString + ",";
+                        if (keyValueQty > 1 && i != keyValueQty - 1) stmString = stmString + ",";
                         stmString = stmString + " ";
                         keyValueOrder.put(i, columnsAndValues.get(key));
                         i++;
                     }
                     stmString = stmString + "WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement(stmString);
-                    for (i = 1; i == keyValueQty; i++) {
-                        stm.setObject(i, keyValueOrder.get(i - 1));
+                    for (i = 0; i < keyValueQty; i++) {
+                        stm.setObject(i + 1, keyValueOrder.get(i));
                     }
                     stm.executeUpdate();
                     handler.succeeded();
                 } catch (SQLException e) {
+                    System.out.println(e.getLocalizedMessage());
                     handler.failed(e);
                 }
             }

@@ -1,4 +1,6 @@
 import java.sql.SQLException;
+import java.sql.Timestamp;
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -18,7 +20,9 @@ public abstract class SQLObject {
     public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
         if (hasChanges()) {
             String tableName = getClass().getName() + "s";
-            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes(), handler);
+            HashMap<String, Object> changes = changes();
+            changes.put("date_updated", new Timestamp(new Date().getTime()));
+            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes, handler);
         } else {
             handler.succeeded();
         }
