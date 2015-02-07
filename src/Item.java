@@ -37,7 +37,7 @@ public class Item extends SQLObject {
 
     private Item() {}
 
-    public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
+    public static ArrayList<Item> fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
         fetchAllObjectsOfClassInBackground(Item.class, new DatabaseManager.SQLQueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) {
@@ -63,6 +63,7 @@ public class Item extends SQLObject {
                 handler.failed(exception);
             }
         });
+        return null;
     }
 
     @Override
