@@ -1,4 +1,7 @@
-import javax.swing.*;
+
+
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -6,8 +9,7 @@ import java.util.ArrayList;
 /**
  * Created by aliyounas on 26/01/15.
  */
-
-    public class BasketViewController extends javax.swing.JFrame {
+public class BasketViewController extends javax.swing.JFrame {
 
     public double totalValue =0.0;
 
@@ -25,9 +27,11 @@ import java.util.ArrayList;
             totalValueLabel = new javax.swing.JLabel();
             checkOutButton = new javax.swing.JButton();
             removeSelectedButton = new javax.swing.JButton();
+            removeSelectedButton.setVisible(false);
             StoreLabel = new javax.swing.JLabel();
             clearCartButton = new javax.swing.JButton();
             splitLabel = new javax.swing.JLabel();
+            updateOrder = new javax.swing.JButton();
 
             setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
             //ArrayList<ArrayList<String>> items = new ArrayList<ArrayList<String>>();
@@ -35,10 +39,10 @@ import java.util.ArrayList;
 
             final DefaultTableModel model = new DefaultTableModel();
 
-            ArrayList<Item> items = Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
+            final ArrayList<Item> items = Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
                 @Override
 
-                public void succeeded(ArrayList<Item> items) {
+                public void succeeded(final ArrayList<Item> items) {
 
 
                     totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
@@ -47,7 +51,7 @@ import java.util.ArrayList;
                     model.addColumn("Name");
                     model.addColumn("Price");
                     model.addColumn("Quantity");
-                    int quantity = 1;
+
 
                     for (int i =0;i<items.size();i++) {
 
@@ -55,7 +59,64 @@ import java.util.ArrayList;
                         totalValue = totalValue + items.get(i).getPrice(); // replace 4.99 with the item price
                         totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                     }
-                    
+
+
+                    removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+
+                            int in = shoppingCartTable.getSelectedRow();
+                            totalValue = totalValue - items.get(in).getPrice(); // use Item.getPrice() method for Item Object or by itemName
+                            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                            model.removeRow(in);
+                            updateOrder.doClick();
+                        }
+                    });
+
+
+                    clearCartButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            int totalRows = shoppingCartTable.getRowCount();
+                            for (int i = 0; totalRows > i; i++) {
+
+                                model.removeRow(0);
+                                updateOrder.doClick();
+                            }
+
+                            //totalValue = 0.00; // use Item.getPrice() method for Item Object or by itemName
+
+
+                        }
+                    });
+
+
+                    shoppingCartTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+                        public void valueChanged(ListSelectionEvent event) {
+                            // do some actions here, for example
+                            // print first column value from selected row
+                            removeSelectedButton.setVisible(true);
+                            //System.out.println(shoppingCartTable.getValueAt(shoppingCartTable.getSelectedRow(), 0).toString());
+                        }
+                    });
+
+                    updateOrder.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            int totalRows = shoppingCartTable.getRowCount();
+                            double totalValue = 0.0;
+
+                            for (int i = 0; i < totalRows; i++) {
+
+                                totalValue = totalValue + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * items.get(i).getPrice();
+                            }
+                            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                        }
+                    });
+
+
+                    checkOutButton.addActionListener(new java.awt.event.ActionListener() {
+                        public void actionPerformed(java.awt.event.ActionEvent evt) {
+                            checkOutButtonActionPerformed(evt);
+                        }
+                    });
                 }
 
                 @Override
@@ -73,29 +134,14 @@ import java.util.ArrayList;
             totalLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
             totalLabel.setText("Total:");
 
-            totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
-            totalValueLabel.setText("£0.00");
 
             checkOutButton.setText("Check Out");
-            checkOutButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    checkOutButtonActionPerformed(evt);
-                }
-            });
-
-            removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
-                public void actionPerformed(java.awt.event.ActionEvent evt) {
-                    //System.out.println(shoppingCartTable.getSelectedRow());
-                    int in = shoppingCartTable.getSelectedRow();
-                    model.removeRow(in);
-                }
-            });
-
+            updateOrder.setText("Update");
 
             removeSelectedButton.setText("Remove Selected Item");
 
-            StoreLabel.setFont(new java.awt.Font("Lucida Grande", 0, 24));
-            StoreLabel.setText("Ordr Store");
+            StoreLabel.setFont(new java.awt.Font("Lucida Grande", 0, 30));
+            StoreLabel.setText("ORDR Basket");
 
             clearCartButton.setText("Clear Cart");
 
@@ -114,15 +160,19 @@ import java.util.ArrayList;
                                                                             .addGroup(layout.createSequentialGroup()
                                                                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                                                                             .addGroup(layout.createSequentialGroup()
-                                                                                    .addGap(58, 58, 58)
+                                                                                    .addGap(100, 100, 100)
                                                                                     .addComponent(StoreLabel))))
                                                             .addComponent(shoppingCartLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                                     .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                     .addGroup(layout.createSequentialGroup()
+
+                                                                            .addComponent(updateOrder)
+                                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                             .addComponent(clearCartButton)
                                                                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                                             .addComponent(removeSelectedButton))
+
                                                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -158,7 +208,8 @@ import java.util.ArrayList;
                                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                             .addComponent(removeSelectedButton)
-                                                            .addComponent(clearCartButton))
+                                                            .addComponent(clearCartButton)
+                                                            .addComponent(updateOrder))
                                                     .addGap(27, 27, 27)
                                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                     )
@@ -185,6 +236,7 @@ import java.util.ArrayList;
          * @param args the command line arguments
          */
         public static void main(String args[]) {
+
 
             try {
                 for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -220,6 +272,7 @@ import java.util.ArrayList;
         private javax.swing.JLabel totalLabel;
         private javax.swing.JLabel totalValueLabel;
         private javax.swing.JLabel StoreLabel;
+    private javax.swing.JButton updateOrder;
     }
 
 
