@@ -9,6 +9,7 @@ import java.util.ArrayList;
 
     public class BasketViewController extends javax.swing.JFrame {
 
+    public double totalValue =0.0;
 
         public BasketViewController() {
             initComponents();
@@ -36,28 +37,25 @@ import java.util.ArrayList;
 
             ArrayList<Item> items = Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
                 @Override
+
                 public void succeeded(ArrayList<Item> items) {
+
+
+                    totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
+                    totalValueLabel.setText("£0.00");
 
                     model.addColumn("Name");
                     model.addColumn("Price");
                     model.addColumn("Quantity");
+                    int quantity = 1;
 
-                    int quantity=1, FirstItem=0,
-                            SecondItem=FirstItem+1;
+                    for (int i =0;i<items.size();i++) {
 
-
-                    for (Item item : items) {
-                        if ((items.get(FirstItem).getName())==(items.get(SecondItem).getName()))
-                        {
-                            quantity++;
-
-                        }
-
-                        model.addRow(new Object[] {item.getName(),item.getPrice(), "2"});
-                        //scount++;
-                        }
-
-
+                        model.addRow(new Object[]{items.get(i).getName(),items.get(i).getPrice() , '1'}); // getPrice method
+                        totalValue = totalValue + items.get(i).getPrice(); // replace 4.99 with the item price
+                        totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                    }
+                    
                 }
 
                 @Override
@@ -114,7 +112,7 @@ import java.util.ArrayList;
                                                                     .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                                     .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                             .addGroup(layout.createSequentialGroup()
-                                                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                                                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                                                                             .addGroup(layout.createSequentialGroup()
                                                                                     .addGap(58, 58, 58)
                                                                                     .addComponent(StoreLabel))))
@@ -131,7 +129,7 @@ import java.util.ArrayList;
                                                                                     .addGap(357, 357, 357))
                                                                             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                                                                     .addGroup(layout.createSequentialGroup()
-                                                                                                    .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
+                                                                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                                                                                     .addGroup(layout.createSequentialGroup()
                                                                                             .addComponent(totalLabel)
                                                                                             .addGap(1, 1, 1)
