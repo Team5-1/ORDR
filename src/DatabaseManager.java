@@ -144,8 +144,8 @@ public class DatabaseManager {
 
     //Accessor method
 
-    public Connection getDbConnection() {
-        return dbConnection;
+    public static Connection getSharedDbConnection() {
+        return sharedManager.dbConnection;
     }
 }
 
