@@ -10,7 +10,12 @@ import java.util.regex.Pattern;
  * Created by kylejm on 25/01/15.
  */
 public class User extends SQLObject {
-    private static String kID_COLUMN_NAME;
+    private static final String kID_COLUMN_NAME = "user_id";
+    private static final String kFIRST_NAME_COLUMN_NAME = "first_name";
+    private static final String kLAST_NAME_COLUMN_NAME = "last_name";
+    private static final String kEMAIL_ADDRESS_COLUMN_NAME = "email";
+    private static final String kPASSWORD_COLUMN_NAME = "password";
+    private static final String kLAST_LOGGED_IN_FIELD = "date_last_logged_in";
 
     //Fetched DB fields
     private String fetchedFirstName;
@@ -60,11 +65,15 @@ public class User extends SQLObject {
             return;
         }
 
-        String stmString = "SELECT user_id, first_name, last_name FROM users WHERE email = '" + emailAddress + "'AND password = MD5('" + password + "')";
+        String select = String.format("SELECT %s, %s, %s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
+        String from = String.format(" FROM %s ", getSQLTableName(User.class));
+        String where = String.format("WHERE %s = '%s' AND %s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
+        String stmString = select + from + where;
         try {
             ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
             if (userDetails.next()) {
                 User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
+                DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
                 handler.succeeded(user);
             } else {
                 handler.emailAddressOrPasswordIncorrect();
@@ -89,7 +98,9 @@ public class User extends SQLObject {
             return;
         }
 
-        String stmString = "INSERT INTO users SET first_name = '" + firstName + "', last_name = '" + lastName + "', email = '" + emailAddress + "', password = MD5('" + password + "')";
+        String columns = String.format("(%s, %s, %s, %s)", kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME, kEMAIL_ADDRESS_COLUMN_NAME, kPASSWORD_COLUMN_NAME);
+        String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
+        String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
         try {
             PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
             stm.execute();
