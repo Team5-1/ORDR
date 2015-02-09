@@ -63,12 +63,16 @@ public class BasketViewController extends javax.swing.JFrame {
 
                     removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
-
+                            //  int r=shoppingCartTable.getRowCount();
                             int in = shoppingCartTable.getSelectedRow();
-                            totalValue = totalValue - items.get(in).getPrice(); // use Item.getPrice() method for Item Object or by itemName
-                            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                            //totalValue = totalValue - (items.get(in).getPrice());
+                            //totalValue = totalValue - ((items.get(in).getPrice())*(Integer.parseInt(shoppingCartTable.getValueAt(in, 2).toString()))) ;
+                            //totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                             model.removeRow(in);
+                            //if (totalValue <=0){ totalValue=0.00; }
+                            // totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                             updateOrder.doClick();
+
                         }
                     });
 
@@ -100,6 +104,7 @@ public class BasketViewController extends javax.swing.JFrame {
 
                     updateOrder.addActionListener(new java.awt.event.ActionListener() {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
+
                             int totalRows = shoppingCartTable.getRowCount();
                             double totalValue = 0.0;
 
@@ -108,6 +113,7 @@ public class BasketViewController extends javax.swing.JFrame {
                                 totalValue = totalValue + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * items.get(i).getPrice();
                             }
                             totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+
                         }
                     });
 
