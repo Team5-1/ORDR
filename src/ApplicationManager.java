@@ -21,19 +21,32 @@ public class ApplicationManager {
                     System.out.println(item.getName());
                     System.out.println(item.getDescription());
                 }
-                Scanner scanner = new Scanner(System.in);
+                final Scanner scanner = new Scanner(System.in);
                 String newName = scanner.nextLine();
-                Item item = items.get(0);
+                final Item item = items.get(0);
                 item.setName(newName);
                 item.save(new DatabaseManager.SQLSaveCompletionHandler() {
                     @Override
                     public void succeeded() {
-                        System.out.print("YAY!");
+                        System.out.println("YAY!");
+                        String anotherName = scanner.nextLine();
+                        item.setName(anotherName);
+                        item.save(new DatabaseManager.SQLSaveCompletionHandler() {
+                            @Override
+                            public void succeeded() {
+                                System.out.println("YAY!");
+                            }
+
+                            @Override
+                            public void failed(SQLException exception) {
+                                System.out.println("BOO!");
+                            }
+                        });
                     }
 
                     @Override
                     public void failed(SQLException exception) {
-                        System.out.print("BOO!");
+                        System.out.println("BOO!");
                     }
                 });
             }
