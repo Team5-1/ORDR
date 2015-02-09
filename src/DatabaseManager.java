@@ -49,13 +49,11 @@ public class DatabaseManager {
                     int keyValueQty = columnsAndValues.size();
                     HashMap<Integer, Object> keyValueOrder = new HashMap<Integer, Object>(columnsAndValues.size());
                     for (String key : columnsAndValues.keySet()) {
-                        stmString = stmString + key + " = ?";
-                        if (keyValueQty > 1 && i != keyValueQty - 1) stmString = stmString + ",";
-                        stmString = stmString + " ";
+                        stmString = stmString + key + " = ?, ";
                         keyValueOrder.put(i, columnsAndValues.get(key));
                         i++;
                     }
-                    stmString = stmString + "WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
+                    stmString = stmString + "date_updated = NOW() WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement(stmString);
                     for (i = 0; i < keyValueQty; i++) {
                         stm.setObject(i + 1, keyValueOrder.get(i));

@@ -20,9 +20,7 @@ public abstract class SQLObject {
     public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
         if (hasChanges()) {
             String tableName = getClass().getName() + "s";
-            HashMap<String, Object> changes = changes();
-            changes.put("date_updated", new Timestamp(new Date().getTime()));
-            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes, handler);
+            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes(), handler);
         } else {
             handler.succeeded();
         }
