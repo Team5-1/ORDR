@@ -32,7 +32,7 @@ public class BackgroundQueue implements Runnable {
     public static void addToQueue(Runnable runnable) {
         sharedBackgroundQueue.queue.offer(runnable);
         synchronized (sharedBackgroundQueue.queue) {
-            sharedBackgroundQueue.queue.notifyAll();
+            sharedBackgroundQueue.queue.notifyAll(); //Next TODO: Is this right thread being paused here? This will be easier to test with GUI because we can call from the events loop
         }
     }
 }
