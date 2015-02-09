@@ -30,6 +30,13 @@ public class User extends SQLObject {
         this.emailAddress = emailAddress;
     }
 
+    public User(int ID, String fetchedFirstName, String fetchedLastName, String fetchedEmailAddress) {
+        this.ID = ID;
+        this.fetchedFirstName = fetchedFirstName;
+        this.fetchedLastName = fetchedLastName;
+        this.fetchedEmailAddress = fetchedEmailAddress;
+    }
+
     private User() {}
 
     @Override
@@ -42,19 +49,42 @@ public class User extends SQLObject {
         return null;
     }
 
-    public void signUpUser(String password, final UserSignUpCompletionHandler handler) {
+    public static void logInInBackground(String emailAddress, String password, LogInCompletionHandler handler) {
+        //Validation
+        if (!emailAddressIsValid(emailAddress)) {
+            handler.emailFormatIncorrect();
+            return;
+        }
+        if (!passwordIsValid(password)) {
+            handler.passwordTooShort();
+            return;
+        }
+
+        String stmString = "SELECT user_id, first_name, last_name FROM users WHERE email = '" + emailAddress + "'AND password = MD5('" + password + "')";
+        try {
+            ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
+            if (userDetails.next()) {
+                User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
+                handler.succeeded(user);
+            } else {
+                handler.emailAddressOrPasswordIncorrect();
+            }
+        } catch (SQLException e) {
+            handler.failed(e);
+        }
+    }
+
+    public void signUpUser(String password, final SignUpCompletionHandler handler) {
         //Validation
         if (ID != 0) {
             handler.succeeded();
             return;
         }
-        Pattern emailRegex = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
-        Matcher matcher = emailRegex.matcher(emailAddress);
-        if (!matcher.find()) {
+        if (!emailAddressIsValid(emailAddress)) {
             handler.emailFormatIncorrect();
             return;
         }
-        if (password.length() < 8) {
+        if (!passwordIsValid(password)) {
             handler.passwordTooShort();
             return;
         }
@@ -83,6 +113,16 @@ public class User extends SQLObject {
         }
     }
 
+    private static boolean emailAddressIsValid(String emailAddress) {
+        Pattern emailRegex = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
+        Matcher matcher = emailRegex.matcher(emailAddress);
+        return matcher.find();
+    }
+
+    private static boolean passwordIsValid(String password) {
+        return (password.length() > 7);
+    }
+
     //Accessor methods
     @Override
     public Boolean hasChanges() {
@@ -99,11 +139,32 @@ public class User extends SQLObject {
         return ID;
     }
 
-    public interface UserSignUpCompletionHandler {
+    public String getFirstName() {
+        return (firstName != null) ? firstName : fetchedFirstName;
+    }
+
+    public String getLastName() {
+        return (lastName != null) ? lastName : fetchedLastName;
+    }
+
+    public String getEmailAddress() {
+        return (emailAddress != null) ? emailAddress : fetchedEmailAddress;
+    }
+
+    public interface LogInCompletionHandler {
+        public void succeeded(User user);
+        public void emailAddressOrPasswordIncorrect();
+        public void failed(SQLException exception);
+        public void passwordTooShort();
+        public void emailFormatIncorrect();
+    }
+
+    public interface SignUpCompletionHandler {
         public void succeeded();
         public void failed(SQLException exception);
         public void passwordTooShort();
         public void emailFormatIncorrect();
         public void emailAddressTaken();
     }
+
 }
