@@ -12,19 +12,21 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> classEntity, DatabaseManager.SQLQueryCompletionHandler handler) {
-        String tableName = classEntity.getName() + "s";
-        DatabaseManager.fetchAllRowsForTableInBackground(tableName, handler);
+    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> SQLObjectSubclass, DatabaseManager.SQLQueryCompletionHandler handler) {
+        DatabaseManager.fetchAllRowsForTableInBackground(getSQLTableName(SQLObjectSubclass), handler);
     }
 
     public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
         if (hasChanges()) {
-            String tableName = getClass().getName() + "s";
-            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes(), handler);
+            DatabaseManager.updateFieldsForRecord(getSQLTableName(), getIDColumnName(), getID(), changes(), handler);
         } else {
             handler.succeeded();
         }
     }
+
+    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getName() + "s"; }
+
+    public String getSQLTableName() { return getSQLTableName(this.getClass()); }
 
     abstract public HashMap<String, Object> changes();
     abstract public Boolean hasChanges();
