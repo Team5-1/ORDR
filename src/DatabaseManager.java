@@ -1,4 +1,5 @@
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -7,6 +8,7 @@ import java.util.Objects;
  */
 public class DatabaseManager {
     static final DatabaseManager sharedManager = new DatabaseManager();
+    //TODO handlers should get calledBack on a different thread to the background thread
 
     private Connection dbConnection;
 
@@ -24,13 +26,13 @@ public class DatabaseManager {
         
     }
 
-    public static  void fetchAllRowsForTableInBackground(final String tableName, final SQLQueryCompletionHandler handler) {
+    public static void fetchAllRowsForTableInBackground(final String tableName, final SQLQueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
                 try {
-                    java.sql.Statement stm = sharedManager.dbConnection.createStatement();
-                    ResultSet results = stm.executeQuery("SELECT * FROM " + tableName);
+                    PreparedStatement stm = sharedManager.dbConnection.prepareStatement("SELECT * FROM " + tableName);
+                    ResultSet results = stm.executeQuery();
                     handler.succeeded(results);
                 } catch (SQLException e) {
                     handler.failed(e);
@@ -45,18 +47,15 @@ public class DatabaseManager {
             public void run() {
                 try {
                     String stmString = "UPDATE " + tableName + " SET ";
-                    int i = 0;
-                    int keyValueQty = columnsAndValues.size();
-                    HashMap<Integer, Object> keyValueOrder = new HashMap<Integer, Object>(columnsAndValues.size());
+                    ArrayList<Object> values = new ArrayList<Object>(columnsAndValues.size());
                     for (String key : columnsAndValues.keySet()) {
-                        stmString = stmString + key + " = ?, ";
-                        keyValueOrder.put(i, columnsAndValues.get(key));
-                        i++;
+                        stmString +=  key + " = ?, ";
+                        values.add(columnsAndValues.get(key));
                     }
-                    stmString = stmString + "date_updated = NOW() WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
+                    stmString += "date_updated = NOW() WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement(stmString);
-                    for (i = 0; i < keyValueQty; i++) {
-                        stm.setObject(i + 1, keyValueOrder.get(i));
+                    for (int i = 0; i < values.size(); i++) {
+                        stm.setObject(i + 1, values.get(i));
                     }
                     stm.executeUpdate();
                     handler.succeeded();
@@ -81,6 +80,13 @@ public class DatabaseManager {
     public interface SQLSaveCompletionHandler {
         public void succeeded();
         public void failed(SQLException exception);
+    }
+
+
+    //Accessor method
+
+    public Connection getDbConnection() {
+        return dbConnection;
     }
 }
 
