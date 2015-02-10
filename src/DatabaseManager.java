@@ -77,6 +77,7 @@ public class DatabaseManager {
         });
     }
 
+    //TODO: this below method might not be needed. Just always fetch all... there aren't that many columns in records
     public static void fetchFieldsForAllRecordsInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
@@ -100,6 +101,7 @@ public class DatabaseManager {
         });
     }
 
+    //TODO: This method might not be needed. SELECT LAST_INSERT_ID() is used instead to get the ID of a newly created record
     public static void queryTableInBackground(final HashMap<String, Object> fieldsAndValuesToMatch, final ArrayList<String> fieldsToFetch, final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
@@ -117,7 +119,7 @@ public class DatabaseManager {
                 ArrayList<Object> values = new ArrayList<Object>(fieldCount);
                 for (String key : fieldsAndValuesToMatch.keySet()) {
                     stmString += key + " = ?";
-                    if (i != fieldCount) stmString +=  ", ";
+                    if (i != fieldCount) stmString +=  " AND ";
                     values.add(fieldsAndValuesToMatch.get(key));
                     i++;
                 }
