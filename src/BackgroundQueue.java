@@ -29,10 +29,10 @@ public class BackgroundQueue implements Runnable {
         }
     }
 
-    public void addToQueue(Runnable runnable) {
-        queue.offer(runnable);
-        synchronized (queue) {
-            queue.notifyAll();
+    public static void addToQueue(Runnable runnable) {
+        sharedBackgroundQueue.queue.offer(runnable);
+        synchronized (sharedBackgroundQueue.queue) {
+            sharedBackgroundQueue.queue.notifyAll(); //Next TODO: Is this right thread being paused here? This will be easier to test with GUI because we can call from the events loop
         }
     }
 }
