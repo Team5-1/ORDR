@@ -14,109 +14,24 @@ public class Basket extends SQLObject {
     private int ID;
     private int userID;
 
-    private class BasketItem extends SQLObject {
-        //DB column names
-        private static final String kID_COLUMN_NAME = "basket_item_id";
-        private static final String kBASKET_ID_COLUMN_NAME = "basket_id";
-        private static final String kITEM_ID_COLUMN_NAME = "item_id";
-        private static final String kQUANTITY_COLUMN_NAME = "quantity";
+    //Shared basket
+    private static final HashMap<Integer, BasketItem> basketItems = new HashMap<Integer, BasketItem>();
 
-        //Constant DB values
-        private int ID;
-        private int itemID;
-        private int basketID;
 
-        //Fetched DB values
-        private int fetchedQuantity;
-
-        //Changed values
-        private int quantity;
-
-        public Basket basket() {
-
-        }
-
-        public Item item() {
-
-        }
-
-        private BasketItem(int ID, int basketID, int itemID) {
-            this.ID = ID;
-            this.basketID = basketID;
-            this.itemID = itemID;
-        }
-
-        public BasketItem makeBasketItem(Item item, Basket basket, final int quantity) {
-            final BasketItem bItem  = new BasketItem(item.getID(), basket.getID(), quantity);
-            BackgroundQueue.addToQueue(new Runnable() {
+    //TODO: Don't think we need handler on this method. Because if it can't save we'll just keep it local
+    public static void addToBasket(final Item item, final int quantity) {
+        if (User.getCurrentUser() != null) {
+            User.getCurrentUser().getBasketID(new User.BasketFetchCompletionHandler() {
                 @Override
-                public void run() {
-                    DatabaseManager.createRecordInBackground(bItem, new DatabaseManager.CreateCompletionHandler() {
-                        @Override
-                        public void succeeded(int ID) {
-                            bItem.ID = ID;
-                            bItem.fetchedQuantity = bItem.quantity;
-                            bItem.quantity = 0;
-                        }
+                public void succeeded(int basketID) {
+                    basketItems.put(item.getID(), BasketItem.makeBasketItem(basketID, item, quantity));
+                }
 
-                        @Override
-                        public void failed(SQLException exception) {
-
-                        }
-                    });
+                @Override
+                public void failed(SQLException exception) {
                 }
             });
-            return bItem;
         }
-
-        //SQLObject methods
-        @Override
-        public String getSQLTableName() {
-            return super.getSQLTableName();
-        }
-
-        @Override
-        public Boolean hasChanges() {
-            return (quantity != 0);
-        }
-
-        @Override
-        public HashMap<String, Object> changes() {
-            HashMap<String, Object> changes = new HashMap<String, Object>(1);
-            changes.put(kQUANTITY_COLUMN_NAME, quantity);
-            return changes;
-        }
-
-        @Override
-        public String getIDColumnName() {
-            return kID_COLUMN_NAME;
-        }
-
-        @Override
-        public int getID() {
-            return ID;
-        }
-
-
-        //Getters
-        public int getQuantity() {
-            return (quantity != 0) ? quantity : fetchedQuantity;
-        }
-
-        //Setters
-        public void setQuantity(int quantity) {
-            this.quantity = (quantity == fetchedQuantity) ? 0 : quantity;
-        }
-    }
-
-    private ArrayList<BasketItem> items;
-
-    //Fetched DB values
-
-    //Changed values
-
-    public static void addToBasket(Item item, int quantity) {
-
     }
 
     //SQLObject methods
@@ -133,7 +48,15 @@ public class Basket extends SQLObject {
     //Getters
     @Override
     public String getIDColumnName() {
-        return null;
+        return kID_COLUMN_NAME;
+    }
+
+    public static String IDColumnName() {
+        return kID_COLUMN_NAME;
+    }
+
+    public static String userIDColumnName() {
+        return kUSER_COLUMN_NAME;
     }
 
     @Override

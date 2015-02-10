@@ -39,6 +39,38 @@ public class Item extends SQLObject {
 
     private Item() {}
 
+    public static void fetchItemWithIDInBackground(int ID, final SingleItemCompletionHandler handler) {
+        HashMap<String, Object> query = new HashMap<String, Object>();
+        query.put(kID_COLUMN_NAME, ID);
+        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(query, getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
+            @Override
+            public void succeeded(ResultSet results) {
+                try {
+                    results.next();
+                    Item item = new Item();
+                    item.ID = results.getInt(kID_COLUMN_NAME);
+                    item.fetchedName = results.getString(kNAME_COLUMN_NAME);
+                    item.fetchedDescription = results.getString(kDESCRIPTION_COLUMN_NAME);
+                    item.fetchedPrice = results.getDouble(kPRICE_COLUMN_NAME);
+                    item.fetchedStockQty = results.getInt(kSTOCK_COLUMN_NAME);
+                    handler.success(item);
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+
+            @Override
+            public void failed(SQLException exception) {
+                handler.failed(exception);
+            }
+
+            @Override
+            public void noResults() {
+                handler.noResult();
+            }
+        });
+    }
+
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
         DatabaseManager.fetchAllRecordsForTableInBackground(getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
             @Override
@@ -64,6 +96,12 @@ public class Item extends SQLObject {
             public void failed(SQLException exception) {
                 handler.failed(exception);
             }
+
+            @Override
+            public void noResults() {
+                handler.noResults();
+            }
+
         });
     }
 
@@ -159,10 +197,12 @@ public class Item extends SQLObject {
     public interface SingleItemCompletionHandler {
         public void success(Item item);
         public void failed(SQLException exception);
+        public void noResult();
     }
 
     public interface MultipleItemCompletionHandler {
         public void succeeded(ArrayList<Item> items);
         public void failed(SQLException exception);
+        public void noResults();
     }
 }

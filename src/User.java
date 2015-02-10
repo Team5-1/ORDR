@@ -1,6 +1,7 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -19,6 +20,7 @@ public class User extends SQLObject {
 
     //Constant DB values
     private int ID;
+    private int basketID;
 
     //Fetched DB values
     private String fetchedFirstName;
@@ -29,6 +31,9 @@ public class User extends SQLObject {
     private String firstName;
     private String lastName;
     private String emailAddress;
+
+    //Current logged in user
+    private static User currentUser;
 
     //Constructors
     public User(String firstName, String lastName, String emailAddress) {
@@ -75,7 +80,7 @@ public class User extends SQLObject {
         }
     }
 
-    public void signUpUser(final String password, final SignUpCompletionHandler handler) {
+    public void signUpInBackground(final String password, final SignUpCompletionHandler handler) {
         //Validation
         if (ID != 0) {
             handler.succeeded();
@@ -121,6 +126,55 @@ public class User extends SQLObject {
         });
     }
 
+    public void getBasketID(final BasketFetchCompletionHandler handler) {
+        if (basketID > 0) {
+            handler.succeeded(basketID);
+            return;
+        }
+        if (ID == 0) {
+            handler.succeeded(0);
+            return;
+        }
+        ArrayList<String> fields = new ArrayList<String>(1);
+        fields.add(Basket.IDColumnName());
+        HashMap<String, Object> query = new HashMap<String, Object>(1);
+        query.put(Basket.userIDColumnName(), ID);
+        DatabaseManager.fetchSpecifiedFieldsForMatchingRecordsInBackground(fields, query, getSQLTableName(Basket.class), new DatabaseManager.QueryCompletionHandler() {
+            @Override
+            public void succeeded(ResultSet results) {
+                try {
+                    basketID = results.getInt(0);
+                    handler.succeeded(basketID);
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+
+            @Override
+            public void failed(SQLException exception) {
+                handler.failed(exception);
+            }
+
+            @Override
+            public void noResults() {
+                HashMap<String, Object> fieldsAndValues = new HashMap<String, Object>(1);
+                fieldsAndValues.put(Basket.userIDColumnName(), ID);
+                DatabaseManager.createRecordInBackground(fieldsAndValues, getSQLTableName(Basket.class), new DatabaseManager.CreateCompletionHandler() {
+                    @Override
+                    public void succeeded(int ID) {
+                        basketID = ID;
+                        handler.succeeded(basketID);
+                    }
+
+                    @Override
+                    public void failed(SQLException exception) {
+                        failed(exception);
+                    }
+                });
+            }
+        });
+    }
+
     private static boolean emailAddressIsValid(String emailAddress) {
         Pattern emailRegex = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailRegex.matcher(emailAddress);
@@ -161,7 +215,11 @@ public class User extends SQLObject {
         return ID;
     }
 
-    //Accessor methods
+    //Getters
+    public static User getCurrentUser() {
+        return currentUser;
+    }
+
     public String getFirstName() {
         return (firstName != null) ? firstName : fetchedFirstName;
     }
@@ -188,6 +246,11 @@ public class User extends SQLObject {
         public void passwordTooShort();
         public void emailFormatIncorrect();
         public void emailAddressTaken();
+    }
+
+    public interface BasketFetchCompletionHandler {
+        public void succeeded(int basketID);
+        public void failed(SQLException exception);
     }
 
 }

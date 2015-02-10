@@ -26,14 +26,13 @@ public class DatabaseManager {
         
     }
 
-    public static void createRecordInBackground(final SQLObject object, final CreateCompletionHandler handler) {
+    public static void createRecordInBackground(final HashMap<String, Object> columnsAndValues, final String tableName, final CreateCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
-                String insert = "INSERT INTO " + object.getSQLTableName();
+                String insert = "INSERT INTO " + tableName;
                 String cols = " (";
                 String values = " VALUES (";
-                HashMap<String, Object> columnsAndValues = object.changes();
                 int columnCount = columnsAndValues.size();
                 int i = 1;
                 ArrayList<Object> orderedValues = new ArrayList<Object>(columnCount);
@@ -54,7 +53,7 @@ public class DatabaseManager {
                     PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
                     stm.execute();
                     ResultSet generatedID = getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
-                    handler.succeeded(generatedID.getInt(object.getIDColumnName()));
+                    handler.succeeded(generatedID.getInt(1));
                 } catch (SQLException e) {
                     handler.failed(e);
                 }
@@ -69,7 +68,45 @@ public class DatabaseManager {
                 try {
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement("SELECT * FROM " + tableName);
                     ResultSet results = stm.executeQuery();
-                    handler.succeeded(results);
+                    if (results.next()) {
+                        results.beforeFirst();
+                        handler.succeeded(results);
+                    } else {
+                        handler.noResults();
+                    }
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+        });
+    }
+
+    public static void fetchAllFieldsForMatchingRecordsInBackground(final HashMap<String, Object> fieldsAndValuesToMatch, final String tableName, final QueryCompletionHandler handler) {
+        BackgroundQueue.addToQueue(new Runnable() {
+            @Override
+            public void run() {
+                String stmString = String.format("SELECT * FROM %s WHERE ", tableName);
+                int fieldCount = fieldsAndValuesToMatch.size();
+                int i = 1;
+                ArrayList<Object> values = new ArrayList<Object>(fieldCount);
+                for (String key : fieldsAndValuesToMatch.keySet()) {
+                    stmString += key + " = ?";
+                    if (i != fieldCount) stmString +=  " AND ";
+                    values.add(fieldsAndValuesToMatch.get(key));
+                    i++;
+                }
+                try {
+                    PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
+                    for (i = 0; i < values.size(); i++) {
+                        stm.setObject(i + 1, values.get(i));
+                    }
+                    ResultSet results = stm.executeQuery();
+                    if (results.next()) {
+                        results.beforeFirst();
+                        handler.succeeded(results);
+                    } else {
+                        handler.noResults();
+                    }
                 } catch (SQLException e) {
                     handler.failed(e);
                 }
@@ -78,7 +115,7 @@ public class DatabaseManager {
     }
 
     //TODO: this below method might not be needed. Just always fetch all... there aren't that many columns in records
-    public static void fetchFieldsForAllRecordsInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
+    public static void fetchSpecifiedFieldsForAllRecordsInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
@@ -93,7 +130,12 @@ public class DatabaseManager {
                 try {
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement(stmString);
                     ResultSet results = stm.executeQuery();
-                    handler.succeeded(results);
+                    if (results.next()) {
+                        results.beforeFirst();
+                        handler.succeeded(results);
+                    } else {
+                        handler.noResults();
+                    }
                 } catch (SQLException e) {
                     handler.failed(e);
                 }
@@ -102,7 +144,7 @@ public class DatabaseManager {
     }
 
     //TODO: This method might not be needed. SELECT LAST_INSERT_ID() is used instead to get the ID of a newly created record
-    public static void queryTableInBackground(final HashMap<String, Object> fieldsAndValuesToMatch, final ArrayList<String> fieldsToFetch, final String tableName, final QueryCompletionHandler handler) {
+    public static void fetchSpecifiedFieldsForMatchingRecordsInBackground(final ArrayList<String> fieldsToFetch, final HashMap<String, Object> fieldsAndValuesToMatch, final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
@@ -128,8 +170,13 @@ public class DatabaseManager {
                     for (i = 0; i < values.size(); i++) {
                         stm.setObject(i + 1, values.get(i));
                     }
-                    ResultSet result = stm.executeQuery();
-                    handler.succeeded(result);
+                    ResultSet results = stm.executeQuery();
+                    if (results.next()) {
+                        results.beforeFirst();
+                        handler.succeeded(results);
+                    } else {
+                        handler.noResults();;
+                    }
                 } catch (SQLException e) {
                     handler.failed(e);
                 }
@@ -177,6 +224,7 @@ public class DatabaseManager {
     public interface QueryCompletionHandler {
         public void succeeded(ResultSet results);
         public void failed(SQLException exception);
+        public void noResults();
     }
 
     public interface SaveCompletionHandler {
