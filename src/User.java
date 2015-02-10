@@ -37,7 +37,7 @@ public class User extends SQLObject {
         this.emailAddress = emailAddress;
     }
 
-    public User(int ID, String fetchedFirstName, String fetchedLastName, String fetchedEmailAddress) {
+    private User(int ID, String fetchedFirstName, String fetchedLastName, String fetchedEmailAddress) {
         this.ID = ID;
         this.fetchedFirstName = fetchedFirstName;
         this.fetchedLastName = fetchedLastName;
@@ -75,7 +75,7 @@ public class User extends SQLObject {
         }
     }
 
-    public void signUpUser(String password, final SignUpCompletionHandler handler) {
+    public void signUpUser(final String password, final SignUpCompletionHandler handler) {
         //Validation
         if (ID != 0) {
             handler.succeeded();
@@ -90,30 +90,35 @@ public class User extends SQLObject {
             return;
         }
 
-        String columns = String.format("(%s, %s, %s, %s)", kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME, kEMAIL_ADDRESS_COLUMN_NAME, kPASSWORD_COLUMN_NAME);
-        String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
-        String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
-        try {
-            PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
-            stm.execute();
-            ResultSet idResult = DatabaseManager.getSharedDbConnection().prepareStatement("SELECT user_id FROM users WHERE email = '" + emailAddress + "'").executeQuery();
-            idResult.next();
-            ID = idResult.getInt("user_id");
-            fetchedFirstName = firstName;
-            firstName = null;
-            fetchedLastName = lastName;
-            lastName = null;
-            fetchedEmailAddress = emailAddress;
-            emailAddress = null;
-            handler.succeeded();
-            //TODO: do you have to close queries when you're done with them?
-        } catch (SQLException e) {
-            if (e.getErrorCode() == 1062) {
-                handler.emailAddressTaken();
-            } else {
-                handler.failed(e);
+        BackgroundQueue.addToQueue(new Runnable() {
+            @Override
+            public void run() {
+                String columns = String.format("(%s, %s, %s, %s)", kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME, kEMAIL_ADDRESS_COLUMN_NAME, kPASSWORD_COLUMN_NAME);
+                String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
+                String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
+                try {
+                    PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
+                    stm.execute();
+                    ResultSet idResult = DatabaseManager.getSharedDbConnection().prepareStatement("SELECT user_id FROM users WHERE email = '" + emailAddress + "'").executeQuery();
+                    idResult.next();
+                    ID = idResult.getInt("user_id");
+                    fetchedFirstName = firstName;
+                    firstName = null;
+                    fetchedLastName = lastName;
+                    lastName = null;
+                    fetchedEmailAddress = emailAddress;
+                    emailAddress = null;
+                    handler.succeeded();
+                    //TODO: do you have to close queries when you're done with them?
+                } catch (SQLException e) {
+                    if (e.getErrorCode() == 1062) {
+                        handler.emailAddressTaken();
+                    } else {
+                        handler.failed(e);
+                    }
+                }
             }
-        }
+        });
     }
 
     private static boolean emailAddressIsValid(String emailAddress) {
@@ -134,7 +139,11 @@ public class User extends SQLObject {
 
     @Override
     public HashMap<String, Object> changes() {
-        return null;
+        HashMap<String, Object> changes  = new HashMap<String, Object>();
+        if (firstName != null) changes.put(kFIRST_NAME_COLUMN_NAME, firstName);
+        if (lastName != null) changes.put(kLAST_NAME_COLUMN_NAME, lastName);
+        if (emailAddress != null) changes.put(kEMAIL_ADDRESS_COLUMN_NAME, emailAddress);
+        return changes;
     }
 
     @Override
