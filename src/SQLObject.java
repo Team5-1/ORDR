@@ -1,6 +1,4 @@
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -12,11 +10,11 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> SQLObjectSubclass, DatabaseManager.SQLQueryCompletionHandler handler) {
+    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> SQLObjectSubclass, DatabaseManager.QueryCompletionHandler handler) {
         DatabaseManager.fetchAllRowsForTableInBackground(getSQLTableName(SQLObjectSubclass), handler);
     }
 
-    public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
+    public void save(DatabaseManager.SaveCompletionHandler handler) {
         if (hasChanges()) {
             DatabaseManager.updateFieldsForRecord(getSQLTableName(), getIDColumnName(), getID(), changes(), handler);
         } else {

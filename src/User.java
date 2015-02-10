@@ -1,4 +1,3 @@
-import javax.xml.crypto.Data;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -10,6 +9,7 @@ import java.util.regex.Pattern;
  * Created by kylejm on 25/01/15.
  */
 public class User extends SQLObject {
+    //DB column names
     private static final String kID_COLUMN_NAME = "user_id";
     private static final String kFIRST_NAME_COLUMN_NAME = "first_name";
     private static final String kLAST_NAME_COLUMN_NAME = "last_name";
@@ -17,13 +17,15 @@ public class User extends SQLObject {
     private static final String kPASSWORD_COLUMN_NAME = "password";
     private static final String kLAST_LOGGED_IN_FIELD = "date_last_logged_in";
 
-    //Fetched DB fields
+    //Constant DB values
+    private int ID;
+
+    //Fetched DB values
     private String fetchedFirstName;
     private String fetchedLastName;
     private String fetchedEmailAddress;
 
-    //Current DB fields
-    private int ID;
+    //Changed values
     private String firstName;
     private String lastName;
     private String emailAddress;
@@ -43,16 +45,6 @@ public class User extends SQLObject {
     }
 
     private User() {}
-
-    @Override
-    public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
-
-    }
-
-    @Override
-    public HashMap<String, Object> changes() {
-        return null;
-    }
 
     public static void logInInBackground(String emailAddress, String password, LogInCompletionHandler handler) {
         //Validation
@@ -134,7 +126,17 @@ public class User extends SQLObject {
         return (password.length() > 7);
     }
 
-    //Accessor methods
+    //SQLObject methods
+    @Override
+    public void save(DatabaseManager.SaveCompletionHandler handler) {
+
+    }
+
+    @Override
+    public HashMap<String, Object> changes() {
+        return null;
+    }
+
     @Override
     public Boolean hasChanges() {
         return (firstName != null || lastName != null || emailAddress != null);
@@ -150,6 +152,7 @@ public class User extends SQLObject {
         return ID;
     }
 
+    //Accessor methods
     public String getFirstName() {
         return (firstName != null) ? firstName : fetchedFirstName;
     }

@@ -8,12 +8,15 @@ import java.util.HashMap;
  */
 
 public class Item extends SQLObject {
-    //DB field names
+    //DB column names
     private static final String kID_COLUMN_NAME = "item_id";
     private static final String kNAME_COLUMN_NAME = "name";
     private static final String kDESCRIPTION_COLUMN_NAME = "description";
     private static final String kPRICE_COLUMN_NAME = "price";
     private static final String kSTOCK_COLUMN_NAME = "stock_qty";
+
+    //Constant DB values
+    private int ID;
 
     //Fetched DB values
     private String fetchedName;
@@ -21,8 +24,7 @@ public class Item extends SQLObject {
     private Double fetchedPrice;
     private Integer fetchedStockQty;
 
-    //Current DB fields
-    private int ID;
+    //Changed values
     private String name;
     private String description;
     private Double price;
@@ -38,7 +40,7 @@ public class Item extends SQLObject {
     private Item() {}
 
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
-        fetchAllObjectsOfClassInBackground(Item.class, new DatabaseManager.SQLQueryCompletionHandler() {
+        fetchAllObjectsOfClassInBackground(Item.class, new DatabaseManager.QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) {
                 ArrayList<Item> items = new ArrayList<Item>();
@@ -65,9 +67,10 @@ public class Item extends SQLObject {
         });
     }
 
+    //SQLObject methods
     @Override
-    public void save(final DatabaseManager.SQLSaveCompletionHandler handler) {
-        super.save(new DatabaseManager.SQLSaveCompletionHandler() {
+    public void save(final DatabaseManager.SaveCompletionHandler handler) {
+        super.save(new DatabaseManager.SaveCompletionHandler() {
             @Override
             public void succeeded() {
                 if (name != null) {
@@ -111,19 +114,18 @@ public class Item extends SQLObject {
         return ((name != null) || (description != null) || (price != null) || stockQty != null);
     }
 
-
-    //Getter methods
-
-
     @Override
     public String getIDColumnName() {
         return kID_COLUMN_NAME;
     }
 
+    @Override
     public int getID() {
         return ID;
     }
 
+
+    //Getter methods
     public String getName() {
         return (name != null) ? name : fetchedName;
     }
