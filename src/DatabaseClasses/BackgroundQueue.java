@@ -1,4 +1,8 @@
+package DatabaseClasses;
+
 import java.util.concurrent.ConcurrentLinkedDeque;
+
+//TODO: should perhaps move this in to DatabaseManager as it's own queue?
 
 /**
  * Created by kylejm on 26/01/15.
