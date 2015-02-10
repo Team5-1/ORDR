@@ -77,7 +77,7 @@ public class DatabaseManager {
         });
     }
 
-    public static void fetchFieldsForTableInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
+    public static void fetchFieldsForAllRecordsInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
