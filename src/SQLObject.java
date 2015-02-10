@@ -10,10 +10,6 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> SQLObjectSubclass, DatabaseManager.QueryCompletionHandler handler) {
-        DatabaseManager.fetchAllRowsForTableInBackground(getSQLTableName(SQLObjectSubclass), handler);
-    }
-
     public void save(DatabaseManager.SaveCompletionHandler handler) {
         if (hasChanges()) {
             DatabaseManager.updateFieldsForRecord(getSQLTableName(), getIDColumnName(), getID(), changes(), handler);

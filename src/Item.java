@@ -40,7 +40,7 @@ public class Item extends SQLObject {
     private Item() {}
 
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
-        fetchAllObjectsOfClassInBackground(Item.class, new DatabaseManager.QueryCompletionHandler() {
+        DatabaseManager.fetchAllRecordsForTableInBackground(getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) {
                 ArrayList<Item> items = new ArrayList<Item>();

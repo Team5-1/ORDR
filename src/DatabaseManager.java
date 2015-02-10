@@ -62,7 +62,7 @@ public class DatabaseManager {
         });
     }
 
-    public static void fetchAllRowsForTableInBackground(final String tableName, final QueryCompletionHandler handler) {
+    public static void fetchAllRecordsForTableInBackground(final String tableName, final QueryCompletionHandler handler) {
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
             public void run() {
