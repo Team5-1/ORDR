@@ -20,7 +20,7 @@ public abstract class SQLObject {
         }
     }
 
-    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getName() + "s"; }
+    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getSimpleName() + "s"; }
 
     public String getSQLTableName() { return getSQLTableName(this.getClass()); }
 
