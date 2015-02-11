@@ -1,5 +1,3 @@
-package DatabaseClasses;
-
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -53,7 +51,7 @@ public class User extends SQLObject {
 
     private User() {}
 
-    public static void logInInBackground(String emailAddress, String password, LogInCompletionHandler handler) {
+    public static void logInInBackground(final String emailAddress, final String password, final LogInCompletionHandler handler) {
         //Validation
         if (!emailAddressIsValid(emailAddress)) {
             handler.emailFormatIncorrect();
@@ -64,22 +62,27 @@ public class User extends SQLObject {
             return;
         }
 
-        String select = String.format("SELECT %s, %s, %s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
-        String from = String.format(" FROM %s ", getSQLTableName(User.class));
-        String where = String.format("WHERE %s = '%s' AND %s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
-        String stmString = select + from + where;
-        try {
-            ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
-            if (userDetails.next()) {
-                User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
-                DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
-                handler.succeeded(user);
-            } else {
-                handler.emailAddressOrPasswordIncorrect();
+        BackgroundQueue.addToQueue(new Runnable() {
+            @Override
+            public void run() {
+                String select = String.format("SELECT %s, %s, %s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
+                String from = String.format(" FROM %s ", getSQLTableName(User.class));
+                String where = String.format("WHERE %s = '%s' AND %s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
+                String stmString = select + from + where;
+                try {
+                    ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
+                    if (userDetails.next()) {
+                        User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
+                        DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
+                        handler.succeeded(user);
+                    } else {
+                        handler.emailAddressOrPasswordIncorrect();
+                    }
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
             }
-        } catch (SQLException e) {
-            handler.failed(e);
-        }
+        });
     }
 
     public void signUpInBackground(final String password, final SignUpCompletionHandler handler) {

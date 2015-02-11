@@ -4,7 +4,8 @@ import javax.swing.*;
  * Created by kylejm on 28/11/14.
  */
 public class ApplicationManager {
-    public static void main(String[] args) {
+
+    public static void applicationDidLaunch() {
         JFrame window = new JFrame("ORDR");
         window.setSize(300, 200);
         LogInViewController vc = new LogInViewController();
@@ -12,4 +13,5 @@ public class ApplicationManager {
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
     }
+
 }

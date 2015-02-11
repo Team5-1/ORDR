@@ -1,5 +1,3 @@
-package DatabaseClasses;
-
 import java.util.concurrent.ConcurrentLinkedDeque;
 
 //TODO: should perhaps move this in to DatabaseManager as it's own queue?
@@ -13,7 +11,7 @@ public class BackgroundQueue implements Runnable {
     private final ConcurrentLinkedDeque<Runnable> queue = new ConcurrentLinkedDeque<Runnable>();
 
     public BackgroundQueue() {
-        Thread thread = new Thread(this);
+        Thread thread = new Thread(this, "SQL Serial Background Thread");
         thread.start();
     }
 
