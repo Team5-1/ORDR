@@ -2,7 +2,6 @@ package DatabaseClasses;
 
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.Objects;
 
 /**
  * Created by kylejm on 10/02/15.
