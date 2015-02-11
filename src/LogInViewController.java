@@ -3,8 +3,6 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.SQLException;
 
-import DatabaseClasses.*;
-
 /**
  * Created by kylejm on 10/02/15.
  */
@@ -31,7 +29,7 @@ public class LogInViewController {
                     }
 
                     @Override
-                    public void failed(SQLException exception) {
+                    public void sqlException(SQLException exception) {
                         ordrLabel.setText("failed");
                         System.out.println(exception.getLocalizedMessage());
                     }
@@ -44,6 +42,11 @@ public class LogInViewController {
                     @Override
                     public void emailFormatIncorrect() {
                         ordrLabel.setText("Email format incorrect");
+                    }
+
+                    @Override
+                    public void threadException(Exception exception) {
+
                     }
                 });
             }

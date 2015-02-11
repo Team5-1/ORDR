@@ -27,7 +27,12 @@ public class Basket extends SQLObject {
                 }
 
                 @Override
-                public void failed(SQLException exception) {
+                public void sqlException(SQLException exception) {
+                }
+
+                @Override
+                public void threadException(Exception exception) {
+
                 }
             });
         }

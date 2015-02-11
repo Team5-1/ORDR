@@ -3,6 +3,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -62,15 +63,27 @@ public class User extends SQLObject {
             return;
         }
 
-        BackgroundQueue.addToQueue(new Runnable() {
+        Callable<ResultSet> query = new Callable<ResultSet>() {
             @Override
-            public void run() {
+            public ResultSet call() throws Exception {
                 String select = String.format("SELECT %s, %s, %s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
                 String from = String.format(" FROM %s ", getSQLTableName(User.class));
                 String where = String.format("WHERE %s = '%s' AND %s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
                 String stmString = select + from + where;
+                ResultSet userDetails = null;
                 try {
-                    ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
+                    userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
+                } catch (SQLException e) {
+                    handler.sqlException(e);
+                }
+                return userDetails;
+            }
+        };
+
+        MainCallback.BackgroundCallback<ResultSet> callback = new MainCallback.BackgroundCallback<ResultSet>() {
+            @Override
+            public void complete(ResultSet userDetails) {
+                try {
                     if (userDetails.next()) {
                         User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
                         DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
@@ -79,10 +92,18 @@ public class User extends SQLObject {
                         handler.emailAddressOrPasswordIncorrect();
                     }
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
-        });
+
+            @Override
+            public void failed(Exception exception) {
+                handler.threadException(exception);
+            }
+        };
+
+        BackgroundQueue.addToQueue(new MainCallback<ResultSet>(query, callback));
+
     }
 
     public void signUpInBackground(final String password, final SignUpCompletionHandler handler) {
@@ -151,13 +172,13 @@ public class User extends SQLObject {
                     basketID = results.getInt(0);
                     handler.succeeded(basketID);
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
 
             @Override
-            public void failed(SQLException exception) {
-                handler.failed(exception);
+            public void sqlException(SQLException exception) {
+                handler.sqlException(exception);
             }
 
             @Override
@@ -172,10 +193,20 @@ public class User extends SQLObject {
                     }
 
                     @Override
-                    public void failed(SQLException exception) {
-                        failed(exception);
+                    public void sqlException(SQLException exception) {
+                        handler.sqlException(exception);
+                    }
+
+                    @Override
+                    public void threadException(Exception exception) {
+                        handler.threadException(exception);
                     }
                 });
+            }
+
+            @Override
+            public void threadException(Exception exception) {
+                handler.threadException(exception);
             }
         });
     }
@@ -237,10 +268,9 @@ public class User extends SQLObject {
         return (emailAddress != null) ? emailAddress : fetchedEmailAddress;
     }
 
-    public interface LogInCompletionHandler {
+    public interface LogInCompletionHandler extends DatabaseManager.SQLCompletionHandler {
         public void succeeded(User user);
         public void emailAddressOrPasswordIncorrect();
-        public void failed(SQLException exception);
         public void passwordTooShort();
         public void emailFormatIncorrect();
     }
@@ -253,9 +283,8 @@ public class User extends SQLObject {
         public void emailAddressTaken();
     }
 
-    public interface BasketFetchCompletionHandler {
+    public interface BasketFetchCompletionHandler extends DatabaseManager.SQLCompletionHandler {
         public void succeeded(int basketID);
-        public void failed(SQLException exception);
     }
 
 }

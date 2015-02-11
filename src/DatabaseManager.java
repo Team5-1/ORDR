@@ -1,6 +1,7 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.Callable;
 
 /**
  * Created by kylejm on 24/01/15.
@@ -26,9 +27,10 @@ public class DatabaseManager {
     }
 
     public static void createRecordInBackground(final HashMap<String, Object> columnsAndValues, final String tableName, final CreateCompletionHandler handler) {
-        BackgroundQueue.addToQueue(new Runnable() {
+        //Create statement callable
+        Callable<ResultSet> task = new Callable<ResultSet>() {
             @Override
-            public void run() {
+            public ResultSet call() throws Exception {
                 String insert = "INSERT INTO " + tableName;
                 String cols = " (";
                 String values = " VALUES (";
@@ -48,16 +50,36 @@ public class DatabaseManager {
                     i++;
                 }
                 String stmString =  insert + cols + values;
+                ResultSet result = null;
                 try {
                     PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
                     stm.execute();
-                    ResultSet generatedID = getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
-                    handler.succeeded(generatedID.getInt(1));
+                    result =  getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery(); //Return results
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
+                return result; //If we got here shit hit the fan and an e
             }
-        });
+        };
+
+        MainCallback.BackgroundCallback<ResultSet> callback = new MainCallback.BackgroundCallback<ResultSet>() {
+            @Override
+            public void complete(ResultSet results) {
+                try {
+                    handler.succeeded(results.getInt(1));
+                } catch (SQLException e) {
+                    handler.sqlException(e);
+                }
+
+            }
+
+            @Override
+            public void failed(Exception exception) {
+                handler.threadException(exception);
+            }
+        };
+
+        BackgroundQueue.addToQueue(new MainCallback<ResultSet>(task, callback));
     }
 
     public static void fetchAllRecordsForTableInBackground(final String tableName, final QueryCompletionHandler handler) {
@@ -74,7 +96,7 @@ public class DatabaseManager {
                         handler.noResults();
                     }
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
         });
@@ -107,7 +129,7 @@ public class DatabaseManager {
                         handler.noResults();
                     }
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
         });
@@ -136,7 +158,7 @@ public class DatabaseManager {
                         handler.noResults();
                     }
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
         });
@@ -177,7 +199,7 @@ public class DatabaseManager {
                         handler.noResults();;
                     }
                 } catch (SQLException e) {
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
         });
@@ -204,7 +226,7 @@ public class DatabaseManager {
                     handler.succeeded();
                 } catch (SQLException e) {
                     System.out.println(e.getLocalizedMessage());
-                    handler.failed(e);
+                    handler.sqlException(e);
                 }
             }
         });
@@ -215,20 +237,22 @@ public class DatabaseManager {
         e.printStackTrace();
     }
 
-    public interface CreateCompletionHandler {
-        public void succeeded(int ID);
-        public void failed(SQLException exception);
+    public interface SQLCompletionHandler {
+        public void sqlException(SQLException exception);
+        public void threadException(Exception exception);
     }
 
-    public interface QueryCompletionHandler {
+    public interface CreateCompletionHandler extends SQLCompletionHandler {
+        public void succeeded(int ID);
+    }
+
+    public interface QueryCompletionHandler extends SQLCompletionHandler {
         public void succeeded(ResultSet results);
-        public void failed(SQLException exception);
         public void noResults();
     }
 
-    public interface SaveCompletionHandler {
+    public interface SaveCompletionHandler extends SQLCompletionHandler {
         public void succeeded();
-        public void failed(SQLException exception);
     }
 
 

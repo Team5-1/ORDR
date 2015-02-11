@@ -60,13 +60,18 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void failed(SQLException exception) {
+            public void sqlException(SQLException exception) {
                 handler.failed(exception);
             }
 
             @Override
             public void noResults() {
                 handler.noResult();
+            }
+
+            @Override
+            public void threadException(Exception exception) {
+
             }
         });
     }
@@ -93,7 +98,7 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void failed(SQLException exception) {
+            public void sqlException(SQLException exception) {
                 handler.failed(exception);
             }
 
@@ -102,6 +107,10 @@ public class Item extends SQLObject {
                 handler.noResults();
             }
 
+            @Override
+            public void threadException(Exception exception) {
+
+            }
         });
     }
 
@@ -131,8 +140,13 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void failed(SQLException exception) {
-                handler.failed(exception);
+            public void sqlException(SQLException exception) {
+                handler.sqlException(exception);
+            }
+
+            @Override
+            public void threadException(Exception exception) {
+
             }
         });
     }
