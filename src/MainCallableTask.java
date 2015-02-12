@@ -3,12 +3,12 @@ import java.util.concurrent.Callable;
 /**
  * Created by kylejm on 11/02/15.
  */
-public class MainCallback<T> implements Runnable {
+public class MainCallableTask<T> implements Runnable {
     private final Callable<T> task;
-    private final BackgroundCallback<T> callback;
+    private final ReturnValueCallback<T> callback;
 
 
-    public MainCallback(Callable<T> task, BackgroundCallback<T> callback) {
+    public MainCallableTask(Callable<T> task, ReturnValueCallback<T> callback) {
         this.task = task;
         this.callback = callback;
     }
@@ -35,7 +35,7 @@ public class MainCallback<T> implements Runnable {
         }
     }
 
-    public interface BackgroundCallback<T> {
+    public interface ReturnValueCallback<T> {
         public void complete(T object);
         public void failed(Exception exception);
     }

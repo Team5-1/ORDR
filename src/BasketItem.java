@@ -32,6 +32,7 @@ public class BasketItem extends SQLObject {
     }
 
     public static BasketItem makeBasketItem(final int basketID, final Item item, final int quantity) {
+        //TODO: Handle duplicate here
         final BasketItem bItem = new BasketItem(item, quantity);
         BackgroundQueue.addToQueue(new Runnable() {
             @Override
@@ -51,11 +52,6 @@ public class BasketItem extends SQLObject {
                     @Override
                     public void sqlException(SQLException exception) {
                         //TODO: handle this
-                    }
-
-                    @Override
-                    public void threadException(Exception exception) {
-
                     }
                 });
             }

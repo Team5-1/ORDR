@@ -69,10 +69,6 @@ public class Item extends SQLObject {
                 handler.noResult();
             }
 
-            @Override
-            public void threadException(Exception exception) {
-
-            }
         });
     }
 
@@ -107,14 +103,11 @@ public class Item extends SQLObject {
                 handler.noResults();
             }
 
-            @Override
-            public void threadException(Exception exception) {
-
-            }
         });
     }
 
     //SQLObject methods
+    //TODO: change this save method to be in the SQLObject only and make a updateFields private abstract method that will be called by SQLObject on save completion
     @Override
     public void save(final DatabaseManager.SaveCompletionHandler handler) {
         super.save(new DatabaseManager.SaveCompletionHandler() {
@@ -142,11 +135,6 @@ public class Item extends SQLObject {
             @Override
             public void sqlException(SQLException exception) {
                 handler.sqlException(exception);
-            }
-
-            @Override
-            public void threadException(Exception exception) {
-
             }
         });
     }

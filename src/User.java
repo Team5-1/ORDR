@@ -80,7 +80,7 @@ public class User extends SQLObject {
             }
         };
 
-        MainCallback.BackgroundCallback<ResultSet> callback = new MainCallback.BackgroundCallback<ResultSet>() {
+        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
             @Override
             public void complete(ResultSet userDetails) {
                 try {
@@ -98,11 +98,11 @@ public class User extends SQLObject {
 
             @Override
             public void failed(Exception exception) {
-                handler.threadException(exception);
+                handler.handleException(exception);
             }
         };
 
-        BackgroundQueue.addToQueue(new MainCallback<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
 
     }
 
@@ -121,16 +121,23 @@ public class User extends SQLObject {
             return;
         }
 
-        BackgroundQueue.addToQueue(new Runnable() {
+        Callable<ResultSet> query = new Callable<ResultSet>() {
             @Override
-            public void run() {
+            public ResultSet call() throws Exception {
+
                 String columns = String.format("(%s, %s, %s, %s)", kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME, kEMAIL_ADDRESS_COLUMN_NAME, kPASSWORD_COLUMN_NAME);
                 String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
                 String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
+                PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
+                stm.execute(); //Insert user
+                return DatabaseManager.getSharedDbConnection().prepareStatement("SELECT user_id FROM users WHERE email = '" + emailAddress + "'").executeQuery();
+            }
+        };
+
+        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
+            @Override
+            public void complete(ResultSet idResult) {
                 try {
-                    PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
-                    stm.execute();
-                    ResultSet idResult = DatabaseManager.getSharedDbConnection().prepareStatement("SELECT user_id FROM users WHERE email = '" + emailAddress + "'").executeQuery();
                     idResult.next();
                     ID = idResult.getInt("user_id");
                     fetchedFirstName = firstName;
@@ -142,14 +149,26 @@ public class User extends SQLObject {
                     handler.succeeded();
                     //TODO: do you have to close queries when you're done with them?
                 } catch (SQLException e) {
-                    if (e.getErrorCode() == 1062) {
-                        handler.emailAddressTaken();
-                    } else {
-                        handler.failed(e);
-                    }
+                    handler.sqlException(e);
                 }
             }
-        });
+
+            @Override
+            public void failed(Exception exception) {
+                if (exception.getClass() == SQLException.class) {
+                    SQLException sqlException = (SQLException) exception;
+                    if (sqlException.getErrorCode() == 1062) {
+                        handler.emailAddressTaken();
+                    } else {
+                        handler.sqlException(sqlException);
+                    }
+                } else {
+                    handler.threadException(exception);
+                }
+            }
+        };
+
+        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
     }
 
     public void getBasketID(final BasketFetchCompletionHandler handler) {
@@ -196,17 +215,7 @@ public class User extends SQLObject {
                     public void sqlException(SQLException exception) {
                         handler.sqlException(exception);
                     }
-
-                    @Override
-                    public void threadException(Exception exception) {
-                        handler.threadException(exception);
-                    }
                 });
-            }
-
-            @Override
-            public void threadException(Exception exception) {
-                handler.threadException(exception);
             }
         });
     }
@@ -268,23 +277,22 @@ public class User extends SQLObject {
         return (emailAddress != null) ? emailAddress : fetchedEmailAddress;
     }
 
-    public interface LogInCompletionHandler extends DatabaseManager.SQLCompletionHandler {
-        public void succeeded(User user);
-        public void emailAddressOrPasswordIncorrect();
-        public void passwordTooShort();
-        public void emailFormatIncorrect();
+    public static abstract class LogInCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+        abstract public void succeeded(User user);
+        abstract public void emailAddressOrPasswordIncorrect();
+        abstract public void passwordTooShort();
+        abstract public void emailFormatIncorrect();
     }
 
-    public interface SignUpCompletionHandler {
-        public void succeeded();
-        public void failed(SQLException exception);
-        public void passwordTooShort();
-        public void emailFormatIncorrect();
-        public void emailAddressTaken();
+    public static abstract class SignUpCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+        abstract public void succeeded();
+        abstract public void passwordTooShort();
+        abstract public void emailFormatIncorrect();
+        abstract public void emailAddressTaken();
     }
 
-    public interface BasketFetchCompletionHandler extends DatabaseManager.SQLCompletionHandler {
-        public void succeeded(int basketID);
+    public static abstract class BasketFetchCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+        abstract public void succeeded(int basketID);
     }
 
 }

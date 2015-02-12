@@ -20,7 +20,7 @@ public class LogInViewController {
                 User.logInInBackground(emailTF.getText(), passwordTF.getText(), new User.LogInCompletionHandler() {
                     @Override
                     public void succeeded(User user) {
-                        ordrLabel.setText(user.getFirstName() + " " + user.getLastName());
+                        ordrLabel.setText("Welcome " + user.getFirstName());
                     }
 
                     @Override
@@ -44,10 +44,6 @@ public class LogInViewController {
                         ordrLabel.setText("Email format incorrect");
                     }
 
-                    @Override
-                    public void threadException(Exception exception) {
-
-                    }
                 });
             }
         });
