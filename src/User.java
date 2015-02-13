@@ -1,7 +1,6 @@
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
@@ -21,7 +20,6 @@ public class User extends SQLObject {
 
     //Constant DB values
     private int ID;
-    private int basketID;
 
     //Fetched DB values
     private String fetchedFirstName;
@@ -35,6 +33,9 @@ public class User extends SQLObject {
 
     //Current logged in user
     private static User currentUser;
+
+    //Users basket
+    private HashMap<Integer, BasketItem> basketItems = new HashMap<Integer, BasketItem>();
 
     //Constructors
     public User(String firstName, String lastName, String emailAddress) {
@@ -63,12 +64,14 @@ public class User extends SQLObject {
             return;
         }
 
+
+
         Callable<ResultSet> query = new Callable<ResultSet>() {
             @Override
             public ResultSet call() throws Exception {
-                String select = String.format("SELECT %s, %s, %s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
+                String select = String.format("SELECT Users.%s, Users.%s, Users.%s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
                 String from = String.format(" FROM %s ", getSQLTableName(User.class));
-                String where = String.format("WHERE %s = '%s' AND %s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
+                String where = String.format("WHERE Users.%s = '%s' AND Users.%s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
                 String stmString = select + from + where;
                 ResultSet userDetails = null;
                 try {
@@ -80,14 +83,25 @@ public class User extends SQLObject {
             }
         };
 
+
         MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
             @Override
             public void complete(ResultSet userDetails) {
                 try {
                     if (userDetails.next()) {
-                        User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
+                        final User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
                         DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
-                        handler.succeeded(user);
+                        user.refreshBasketInBackground(new BasketRefreshCompletionHandler() {
+                            @Override
+                            public void succeeded() {
+                                handler.succeeded(user);
+                            }
+
+                            @Override
+                            public void sqlException(SQLException exception) {
+                                handler.sqlException(exception);
+                            }
+                        });
                     } else {
                         handler.emailAddressOrPasswordIncorrect();
                     }
@@ -171,53 +185,30 @@ public class User extends SQLObject {
         BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
     }
 
-    public void getBasketID(final BasketFetchCompletionHandler handler) {
-        if (basketID > 0) {
-            handler.succeeded(basketID);
-            return;
-        }
-        if (ID == 0) {
-            handler.succeeded(0);
-            return;
-        }
-        ArrayList<String> fields = new ArrayList<String>(1);
-        fields.add(Basket.IDColumnName());
-        HashMap<String, Object> query = new HashMap<String, Object>(1);
-        query.put(Basket.userIDColumnName(), ID);
-        DatabaseManager.fetchSpecifiedFieldsForMatchingRecordsInBackground(fields, query, getSQLTableName(Basket.class), new DatabaseManager.QueryCompletionHandler() {
+    public void refreshBasketInBackground(final BasketRefreshCompletionHandler handler) {
+        final User selfPointer = this;
+        BasketItem.fetchAllBasketItemsForUser(this, new BasketItem.MultipleBasketItemCompletionHandler() {
             @Override
-            public void succeeded(ResultSet results) {
-                try {
-                    basketID = results.getInt(0);
-                    handler.succeeded(basketID);
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
+            public void succeeded(HashMap<Integer, BasketItem> basketItems) {
+                selfPointer.basketItems = basketItems;
+                handler.succeeded();
             }
 
             @Override
             public void sqlException(SQLException exception) {
                 handler.sqlException(exception);
             }
-
-            @Override
-            public void noResults() {
-                HashMap<String, Object> fieldsAndValues = new HashMap<String, Object>(1);
-                fieldsAndValues.put(Basket.userIDColumnName(), ID);
-                DatabaseManager.createRecordInBackground(fieldsAndValues, getSQLTableName(Basket.class), new DatabaseManager.CreateCompletionHandler() {
-                    @Override
-                    public void succeeded(int ID) {
-                        basketID = ID;
-                        handler.succeeded(basketID);
-                    }
-
-                    @Override
-                    public void sqlException(SQLException exception) {
-                        handler.sqlException(exception);
-                    }
-                });
-            }
         });
+    }
+
+    public void addToBasket(final Item item, final int quantity) {
+        if (item.getID() == 0) return;
+        if (basketItems.containsKey(item.getID())) {
+            BasketItem bItem = basketItems.get(item.getID());
+            bItem.setQuantity(bItem.getQuantity() + quantity);
+        } else {
+            basketItems.put(item.getID(), BasketItem.makeBasketItem(getID(), item, quantity));
+        }
     }
 
     private static boolean emailAddressIsValid(String emailAddress) {
@@ -291,8 +282,7 @@ public class User extends SQLObject {
         abstract public void emailAddressTaken();
     }
 
-    public static abstract class BasketFetchCompletionHandler extends DatabaseManager.SQLCompletionHandler {
-        abstract public void succeeded(int basketID);
+    public static abstract class BasketRefreshCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+        abstract public void succeeded();
     }
-
 }

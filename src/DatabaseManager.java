@@ -286,6 +286,8 @@ public class DatabaseManager {
         BackgroundQueue.addToQueue(new MainRunnableTask(query, callback));
     }
 
+    // All callback completion handlers will be executed on the main thread
+    // TODO: make it so that the handlers get called back on the thread the call was made on
     public static abstract class SQLCompletionHandler {
         public void handleException(Exception e) {
             if (e.getClass() == SQLException.class) {
