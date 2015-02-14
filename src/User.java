@@ -94,6 +94,7 @@ public class User extends SQLObject {
                         user.refreshBasketInBackground(new BasketRefreshCompletionHandler() {
                             @Override
                             public void succeeded() {
+                                currentUser = user;
                                 handler.succeeded(user);
                             }
 
@@ -148,6 +149,7 @@ public class User extends SQLObject {
             }
         };
 
+        final User selfPointer = this;
         MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
             @Override
             public void complete(ResultSet idResult) {
@@ -160,6 +162,7 @@ public class User extends SQLObject {
                     lastName = null;
                     fetchedEmailAddress = emailAddress;
                     emailAddress = null;
+                    currentUser = selfPointer;
                     handler.succeeded();
                     //TODO: do you have to close queries when you're done with them?
                 } catch (SQLException e) {
