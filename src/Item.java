@@ -313,7 +313,6 @@ public class Item extends SQLObject {
 
         @Override
         public HashMap<String, Object> changes() {
-            if
             HashMap<String, Object> changes = new HashMap<String, Object>(1);
             if (quantity != 0) changes.put(kQUANTITY_COLUMN_NAME, quantity);
             return changes;
