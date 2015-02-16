@@ -70,31 +70,31 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="4a5bc" class="javax.swing.JLabel" binding="name_label">
+              <component id="4a5bc" class="javax.swing.JLabel" binding="firstname_label">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font name="Heiti SC" size="12"/>
-                  <text value="Full Name"/>
+                  <text value="First Name"/>
                 </properties>
               </component>
-              <component id="4d757" class="javax.swing.JLabel" binding="email_label">
+              <component id="4d757" class="javax.swing.JLabel" binding="surname_label">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font name="Heiti SC" size="12"/>
-                  <text value="Email"/>
+                  <text value="Surname"/>
                 </properties>
               </component>
-              <component id="ad336" class="javax.swing.JLabel" binding="account_label">
+              <component id="ad336" class="javax.swing.JLabel" binding="email_label">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
                 </constraints>
                 <properties>
                   <font name="Heiti SC" size="12"/>
-                  <text value="Account Number"/>
+                  <text value="Email"/>
                 </properties>
               </component>
               <component id="7d1" class="javax.swing.JLabel" binding="comment_label">
@@ -116,7 +116,7 @@
             <properties/>
             <border type="none"/>
             <children>
-              <component id="44a5b" class="javax.swing.JTextField" binding="nameFill">
+              <component id="44a5b" class="javax.swing.JTextField" binding="firstnameFill">
                 <constraints>
                   <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -130,7 +130,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="a375f" class="javax.swing.JTextField" binding="emailFill">
+              <component id="a375f" class="javax.swing.JTextField" binding="surnameFill">
                 <constraints>
                   <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -144,7 +144,7 @@
                   <text value=""/>
                 </properties>
               </component>
-              <component id="4a578" class="javax.swing.JTextField" binding="accountFill">
+              <component id="4a578" class="javax.swing.JTextField" binding="emailFill">
                 <constraints>
                   <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
                     <preferred-size width="150" height="-1"/>
@@ -155,6 +155,7 @@
                   <enabled value="true"/>
                   <font name="Abadi MT Condensed Light" size="10"/>
                   <foreground color="-12105913"/>
+                  <text value=""/>
                 </properties>
               </component>
               <component id="df3f2" class="javax.swing.JTextField" binding="commentFill">

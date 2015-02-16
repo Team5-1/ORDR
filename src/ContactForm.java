@@ -11,19 +11,19 @@ public class ContactForm {
     private JLabel contact_label;
     private JPanel info_panel;
     private JLabel form_label;
-    private JLabel name_label;
-    private JLabel email_label;
+    private JLabel firstname_label;
     private JLabel comment_label;
     private JPanel form_panel;
     private JPanel leftForm_panel;
-    private JLabel account_label;
     private JPanel rightForm_panel;
-    private JTextField nameFill;
-    private JTextField emailFill;
-    private JTextField accountFill;
     private JTextField commentFill;
     private JCheckBox subscribe_checkbox;
     private JButton submit_button;
+    private JLabel surname_label;
+    private JLabel email_label;
+    private JTextField firstnameFill;
+    private JTextField surnameFill;
+    private JTextField emailFill;
 
 
 //    private void createUIComponents() {
