@@ -5,10 +5,12 @@ import javax.swing.*;
  */
 public class ApplicationManager {
     public static void main(String[] args) {
-        AddEditProductViewController vc = new AddEditProductViewController();
-        vc.setSize(300, 200);
-        vc.setTitle("Add Product");
-        vc.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        vc.setVisible(true);
+        JFrame frame = new JFrame("Contact Form");
+        ContactForm vc = new ContactForm();
+        frame.setContentPane(vc.getView());
+        frame.setSize(300, 300);
+        frame.setTitle("Add Product");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
     }
 }
