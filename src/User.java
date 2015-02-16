@@ -35,7 +35,7 @@ public class User extends SQLObject {
     private static User currentUser;
 
     //Users basket
-    private HashMap<Integer, BasketItem> basketItems = new HashMap<Integer, BasketItem>();
+    private HashMap<Integer, Item.BasketItem> basketItems = new HashMap<Integer, Item.BasketItem>();
 
     //Constructors
     public User(String firstName, String lastName, String emailAddress) {
@@ -190,9 +190,9 @@ public class User extends SQLObject {
 
     public void refreshBasketInBackground(final BasketRefreshCompletionHandler handler) {
         final User selfPointer = this;
-        BasketItem.fetchAllBasketItemsForUser(this, new BasketItem.MultipleBasketItemCompletionHandler() {
+        Item.BasketItem.fetchAllBasketItemsForUser(this, new Item.BasketItem.MultipleBasketItemCompletionHandler() {
             @Override
-            public void succeeded(HashMap<Integer, BasketItem> basketItems) {
+            public void succeeded(HashMap<Integer, Item.BasketItem> basketItems) {
                 selfPointer.basketItems = basketItems;
                 handler.succeeded();
             }
@@ -207,10 +207,10 @@ public class User extends SQLObject {
     public void addToBasket(final Item item, final int quantity) {
         if (item.getID() == 0) return;
         if (basketItems.containsKey(item.getID())) {
-            BasketItem bItem = basketItems.get(item.getID());
+            Item.BasketItem bItem = basketItems.get(item.getID());
             bItem.setQuantity(bItem.getQuantity() + quantity);
         } else {
-            basketItems.put(item.getID(), BasketItem.makeBasketItem(getID(), item, quantity));
+            basketItems.put(item.getID(), Item.BasketItem.makeBasketItem(getID(), item, quantity));
         }
     }
 
