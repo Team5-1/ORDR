@@ -14,7 +14,7 @@ public class ApplicationManager {
     public static void applicationDidLaunch() {
         JFrame window = new JFrame("ORDR");
         final JPanel mainView = new JPanel(new BorderLayout());
-        window.setSize(300, 200);
+        window.setSize(800, 600);
         window.add(mainView);
         mainView.add(logInVC.getView(), BorderLayout.CENTER);
         JPanel nav = new JPanel();
