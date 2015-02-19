@@ -155,7 +155,7 @@ public class User extends SQLObject {
             public void complete(ResultSet idResult) {
                 try {
                     idResult.next();
-                    ID = idResult.getInt("user_id");
+                    ID = idResult.getInt(kID_COLUMN_NAME);
                     fetchedFirstName = firstName;
                     firstName = null;
                     fetchedLastName = lastName;
@@ -172,7 +172,7 @@ public class User extends SQLObject {
 
             @Override
             public void failed(Exception exception) {
-                if (exception.getClass() == SQLException.class) {
+                if (SQLException.class.isAssignableFrom(exception.getClass())) {
                     SQLException sqlException = (SQLException) exception;
                     if (sqlException.getErrorCode() == 1062) {
                         handler.emailAddressTaken();
