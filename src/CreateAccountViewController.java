@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.sql.SQLException;
 
 /**
  * Created by kylejm on 18/02/15.
@@ -18,7 +19,33 @@ public class CreateAccountViewController {
         createAccountButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                //Add signup logic here
+                User newUser = new User(textField1.getText(), textField2.getText(), textField3.getText());
+                newUser.signUpInBackground(passwordField1.getText(), new User.SignUpCompletionHandler() {
+                    @Override
+                    public void succeeded() {
+                        
+                    }
+
+                    @Override
+                    public void passwordTooShort() {
+
+                    }
+
+                    @Override
+                    public void emailFormatIncorrect() {
+
+                    }
+
+                    @Override
+                    public void emailAddressTaken() {
+
+                    }
+
+                    @Override
+                    public void sqlException(SQLException exception) {
+
+                    }
+                });
             }
         });
     }
