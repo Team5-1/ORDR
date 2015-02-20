@@ -7,7 +7,7 @@ public class Main {
     private static final LinkedBlockingQueue<Runnable> mainThreadQueue = new LinkedBlockingQueue<Runnable>();
 
     public static void main(String[] args) {
-        ApplicationManager.applicationDidLaunch();
+//        ApplicationManager.applicationDidLaunch();
 
         while (true) {
             try {

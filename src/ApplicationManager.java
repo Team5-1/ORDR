@@ -8,7 +8,7 @@ public class ApplicationManager {
         JFrame frame = new JFrame("Contact Form");
         ContactForm vc = new ContactForm();
         frame.setContentPane(vc.getView());
-        frame.setSize(300, 300);
+        frame.setSize(500, 400);
         frame.setTitle("Add Product");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
