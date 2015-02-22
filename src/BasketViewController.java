@@ -65,10 +65,13 @@ public class BasketViewController extends javax.swing.JFrame {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
                             //  int r=shoppingCartTable.getRowCount();
                             int in = shoppingCartTable.getSelectedRow();
+                            System.out.println(in + "selected row");
                             //totalValue = totalValue - (items.get(in).getPrice());
                             //totalValue = totalValue - ((items.get(in).getPrice())*(Integer.parseInt(shoppingCartTable.getValueAt(in, 2).toString()))) ;
                             //totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                             model.removeRow(in);
+                            items.remove(in);
+
                             //if (totalValue <=0){ totalValue=0.00; }
                             // totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                             updateOrder.doClick();
@@ -83,6 +86,7 @@ public class BasketViewController extends javax.swing.JFrame {
                             for (int i = 0; totalRows > i; i++) {
 
                                 model.removeRow(0);
+                                items.remove(i);
                                 updateOrder.doClick();
                             }
 
@@ -106,6 +110,8 @@ public class BasketViewController extends javax.swing.JFrame {
                         public void actionPerformed(java.awt.event.ActionEvent evt) {
 
                             int totalRows = shoppingCartTable.getRowCount();
+                            System.out.println(totalRows + "total rows");
+
                             double totalValue = 0.0;
 
                             for (int i = 0; i < totalRows; i++) {
