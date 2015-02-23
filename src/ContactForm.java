@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -28,6 +29,7 @@ public class ContactForm {
     private JTextField emailFill;
     private JLabel errorLbl;
     private JLabel ContactDetail_Label;
+    private JLabel logoLabel;
 
 
 //    private void createUIComponents() {
@@ -37,6 +39,15 @@ public class ContactForm {
 
 
     public ContactForm() {
+        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
+
+        Image img = icon.getImage();
+        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(newImage);
+
+
+        logoLabel.setIcon(newIcon);
+
         submit_button.addActionListener(new ActionListener() {
             int error = 0;
 
