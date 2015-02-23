@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -13,19 +12,11 @@ public class ItemView {
     private JComboBox quantityCmb;
     private JPanel panel;
     private JLabel priceTotalLabel;
-    private JButton CheckoutButton;
+    private JButton BasketButton;
     private JLabel logoLabel;
     private Item item;
 
     public ItemView(final Item item) {
-        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
-
-        Image img = icon.getImage();
-        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
-        ImageIcon newIcon = new ImageIcon(newImage);
-
-
-        logoLabel.setIcon(newIcon);
 
         this.item = item;
         populateField();

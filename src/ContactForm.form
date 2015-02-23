@@ -8,19 +8,6 @@
     <properties/>
     <border type="none"/>
     <children>
-      <component id="bc999" class="javax.swing.JLabel" binding="ordr_label">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
-        </constraints>
-        <properties>
-          <font name="Heiti SC" size="72"/>
-          <horizontalAlignment value="0"/>
-          <horizontalTextPosition value="0"/>
-          <iconTextGap value="0"/>
-          <inheritsPopupMenu value="false"/>
-          <text value="ORDR"/>
-        </properties>
-      </component>
       <component id="48905" class="javax.swing.JLabel" binding="contact_label">
         <constraints>
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
@@ -216,6 +203,19 @@
         </constraints>
         <properties>
           <text value=""/>
+        </properties>
+      </component>
+      <component id="bc999" class="javax.swing.JLabel" binding="ordr_label">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Heiti SC" size="72"/>
+          <horizontalAlignment value="0"/>
+          <horizontalTextPosition value="0"/>
+          <iconTextGap value="0"/>
+          <inheritsPopupMenu value="false"/>
+          <text value="ORDR"/>
         </properties>
       </component>
     </children>
