@@ -35,7 +35,7 @@ You could put in the credentials on any MySQL server, but we recommened doing it
 To initialse ORDR tables and data: 
 
 1. Create a new databse on your MySQL server 
-2. Download and then import the ORDR.sql file in phpMyAdmin (*note*: you will first have to create a new database) 
+2. Download and then import the [ORDR.sql](https://github.com/Team5-1/ORDR/blob/master/ORDR.sql) file in phpMyAdmin (*note*: you will first have to create a new database) 
 
 ### Useful links
 
