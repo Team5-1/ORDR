@@ -1,6 +1,4 @@
 import java.sql.SQLException;
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -12,21 +10,18 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    protected static void fetchAllObjectsOfClassInBackground(Class<? extends SQLObject> classEntity, DatabaseManager.SQLQueryCompletionHandler handler) {
-        String tableName = classEntity.getName() + "s";
-        DatabaseManager.fetchAllRowsForTableInBackground(tableName, handler);
-    }
-
-    public void save(DatabaseManager.SQLSaveCompletionHandler handler) {
+    public void save(DatabaseManager.SaveCompletionHandler handler) {
         if (hasChanges()) {
-            String tableName = getClass().getName() + "s";
-            HashMap<String, Object> changes = changes();
-            changes.put("date_updated", new Timestamp(new Date().getTime()));
-            DatabaseManager.updateFieldsForRecord(tableName, getIDColumnName(), getID(), changes, handler);
+            DatabaseManager.updateFieldsForRecord(getSQLTableName(), getIDColumnName(), getID(), changes(), handler);
         } else {
             handler.succeeded();
         }
     }
+
+    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getSimpleName() + "s"; }
+
+    //TODO: Couldn't this be overridden in sublclasses so they pass themselves.class instead of passing in the class in every call
+    public String getSQLTableName() { return getSQLTableName(this.getClass()); }
 
     abstract public HashMap<String, Object> changes();
     abstract public Boolean hasChanges();
