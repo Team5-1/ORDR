@@ -39,9 +39,14 @@ public class BasketViewController extends javax.swing.JFrame {
 
             final DefaultTableModel model = new DefaultTableModel();
 
-            final ArrayList<Item> items = Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
-                @Override
+            Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
 
+                @Override
+                public void noResults() {
+                    System.out.println("NONE");
+                }
+
+                @Override
                 public void succeeded(final ArrayList<Item> items) {
 
 
@@ -133,7 +138,7 @@ public class BasketViewController extends javax.swing.JFrame {
 
                 @Override
                 public void failed(SQLException exception) {
-
+                    System.out.println(exception.getLocalizedMessage());
                 }
             });
 
@@ -247,33 +252,7 @@ public class BasketViewController extends javax.swing.JFrame {
         /**
          * @param args the command line arguments
          */
-        public static void main(String args[]) {
 
-
-            try {
-                for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                    if ("Nimbus".equals(info.getName())) {
-                        javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                        break;
-                    }
-                }
-            } catch (ClassNotFoundException ex) {
-                java.util.logging.Logger.getLogger(BasketViewController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            } catch (InstantiationException ex) {
-                java.util.logging.Logger.getLogger(BasketViewController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            } catch (IllegalAccessException ex) {
-                java.util.logging.Logger.getLogger(BasketViewController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-                java.util.logging.Logger.getLogger(BasketViewController.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-            }
-
-
-            java.awt.EventQueue.invokeLater(new Runnable() {
-                public void run() {
-                    new BasketViewController().setVisible(true);
-                }
-            });
-        }
         private javax.swing.JButton checkOutButton;
         private javax.swing.JButton clearCartButton;
         private javax.swing.JScrollPane jScrollPane1;
