@@ -271,6 +271,10 @@ public class User extends SQLObject {
         return (emailAddress != null) ? emailAddress : fetchedEmailAddress;
     }
 
+    public HashMap<Integer, Item.BasketItem> getBasket() {
+        return basketItems;
+    }
+
     public static abstract class LogInCompletionHandler extends DatabaseManager.SQLCompletionHandler {
         abstract public void succeeded(User user);
         abstract public void emailAddressOrPasswordIncorrect();

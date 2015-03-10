@@ -13,12 +13,12 @@ public class ApplicationManager {
     private static final ItemListView listVC = new ItemListView();
     private static final BasketViewController basketVC = new BasketViewController();
     private static ViewController currentVC = logInVC;
+    private static final JPanel mainView = new JPanel(new BorderLayout());
 
     public static void applicationDidLaunch() {
         JFrame window = new JFrame("ORDR");
 
         //Create view to contain all view controllers
-        final JPanel mainView = new JPanel(new BorderLayout());
         window.setSize(800, 600);
         window.add(mainView);
         mainView.add(logInVC.getView(), BorderLayout.CENTER);
@@ -87,8 +87,14 @@ public class ApplicationManager {
         window.setVisible(true);
     }
 
-    public void setDisplayedViewController(ViewController controller) {
-        //NEXT TODO: implement this
+    public static void setDisplayedViewController(ViewController controller) {
+        if (currentVC != controller) {
+            mainView.remove(currentVC.getView());
+            currentVC = controller;
+            mainView.add(controller.getView(),  BorderLayout.CENTER);
+            mainView.revalidate();
+            mainView.repaint();
+        }
     }
 
 }

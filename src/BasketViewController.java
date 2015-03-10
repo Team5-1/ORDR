@@ -7,6 +7,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 /**
  * Created by aliyounas on 26/01/15.
@@ -51,6 +52,20 @@ public class BasketViewController extends JFrame implements ViewController {
         //items.add(WIDTH, null);
 
         final DefaultTableModel model = new DefaultTableModel();
+
+        //ALI!!!!!!
+        //LOOK HERE!
+        //TODO
+
+//        int i = 0;
+//        for (Item.BasketItem bItem : User.getCurrentUser().getBasket().values()) {
+//
+//            Double itemPrice = bItem.getItem().getPrice();
+//            model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'}); // getPrice method
+//            totalValue = totalValue + itemPrice; // replace 4.99 with the item price
+//            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+//            i++;
+//        }
 
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
 
@@ -264,7 +279,28 @@ public class BasketViewController extends JFrame implements ViewController {
     }
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        // TODO add your handling code here:
+        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
+            @Override
+            public void succeeded(ArrayList<Item> items) {
+                HashMap<Integer, Item.BasketItem> basket = new HashMap<Integer, Item.BasketItem>(items.size());
+                for (Item item : items) {
+                    Item.BasketItem bItem = Item.BasketItem.makeBasketItem(30, item, 3);
+                    basket.put(item.getID(), bItem);
+                }
+                OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
+                ApplicationManager.setDisplayedViewController(orderVC);
+            }
+
+            @Override
+            public void failed(SQLException exception) {
+
+            }
+
+            @Override
+            public void noResults() {
+
+            }
+        });
     }
 
     /**
