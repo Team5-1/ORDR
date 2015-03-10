@@ -13,10 +13,14 @@ public class ApplicationManager {
 
     public static void applicationDidLaunch() {
         JFrame window = new JFrame("ORDR");
+
+        //Create view to contain all view controllers
         final JPanel mainView = new JPanel(new BorderLayout());
         window.setSize(800, 600);
         window.add(mainView);
         mainView.add(logInVC.getView(), BorderLayout.CENTER);
+
+        //Create nav bar
         JPanel nav = new JPanel();
         final JButton logInButton = new JButton("Log in");
         logInButton.addMouseListener(new MouseAdapter() {
@@ -44,6 +48,8 @@ public class ApplicationManager {
         });
         nav.add(logInButton, BorderLayout.NORTH);
         nav.add(createButton, BorderLayout.NORTH);
+
+        //Add nav bar
         mainView.add(nav, BorderLayout.NORTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
