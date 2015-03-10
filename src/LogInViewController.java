@@ -6,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by kylejm on 10/02/15.
  */
-public class LogInViewController {
+public class LogInViewController implements ViewController {
     private JPanel view;
     private JButton signInButton;
     private JTextField emailTF;

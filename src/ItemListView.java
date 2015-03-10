@@ -10,7 +10,7 @@ import java.util.ArrayList;
  * Created by danyalaboobakar on 28/01/15.
  */
 
-public class ItemListView {
+public class ItemListView implements ViewController {
 
     public JPanel Table;
     private JTable itemsTable;
@@ -49,6 +49,11 @@ public class ItemListView {
             public void failed(SQLException exception) {
 
             }
+
+            @Override
+            public void noResults() {
+                //TODO: handle
+            }
         });
         itemsTable.addMouseListener(new MouseAdapter() {
             @Override
@@ -60,6 +65,11 @@ public class ItemListView {
             }
 
         });
+    }
+
+    @Override
+    public JPanel getView() {
+        return Table;
     }
 }
 

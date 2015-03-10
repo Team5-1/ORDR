@@ -10,6 +10,8 @@ public class ApplicationManager {
 
     private static final LogInViewController logInVC = new LogInViewController();
     private static final CreateAccountViewController createAccVC = new CreateAccountViewController();
+    private static final ItemListView listVC = new ItemListView();
+    private static ViewController currentVC = logInVC;
 
     public static void applicationDidLaunch() {
         JFrame window = new JFrame("ORDR");
@@ -26,8 +28,9 @@ public class ApplicationManager {
         logInButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (!logInVC.getView().isDisplayable()) {
-                    mainView.remove(createAccVC.getView());
+                if (currentVC != logInVC) {
+                    mainView.remove(currentVC.getView());
+                    currentVC = logInVC;
                     mainView.add(logInVC.getView(), BorderLayout.CENTER);
                     mainView.revalidate();
                     mainView.repaint();
@@ -38,9 +41,23 @@ public class ApplicationManager {
         createButton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseReleased(MouseEvent e) {
-                if (!createAccVC.getView().isDisplayable()) {
-                    mainView.remove(logInVC.getView());
+                if (currentVC != createAccVC) {
+                    mainView.remove(currentVC.getView());
+                    currentVC = createAccVC;
                     mainView.add(createAccVC.getView(),  BorderLayout.CENTER);
+                    mainView.revalidate();
+                    mainView.repaint();
+                }
+            }
+        });
+        final JButton listButton = new JButton("Products");
+        listButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (currentVC != listVC) {
+                    mainView.remove(currentVC.getView());
+                    currentVC = listVC;
+                    mainView.add(listVC.getView(),  BorderLayout.CENTER);
                     mainView.revalidate();
                     mainView.repaint();
                 }
@@ -48,11 +65,15 @@ public class ApplicationManager {
         });
         nav.add(logInButton, BorderLayout.NORTH);
         nav.add(createButton, BorderLayout.NORTH);
-
+        nav.add(listButton, BorderLayout.NORTH);
         //Add nav bar
         mainView.add(nav, BorderLayout.NORTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
+    }
+
+    public void setDisplayedViewController(ViewController controller) {
+        //NEXT TODO: implement this
     }
 
 }

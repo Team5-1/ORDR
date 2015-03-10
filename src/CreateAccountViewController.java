@@ -6,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by kylejm on 18/02/15.
  */
-public class CreateAccountViewController {
+public class CreateAccountViewController implements ViewController {
     private JTextField firstNameTF;
     private JPanel view;
     private JTextField lastNameTF;
