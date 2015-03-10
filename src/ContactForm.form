@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<form xmlns="http://www.intellij.com/uidesigner/form/" version="1" bind-to-class="ContactForm">
+  <grid id="27dc6" binding="main_panel" layout-manager="GridLayoutManager" row-count="6" column-count="3" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+    <margin top="0" left="0" bottom="0" right="0"/>
+    <constraints>
+      <xy x="20" y="20" width="500" height="400"/>
+    </constraints>
+    <properties/>
+    <border type="none"/>
+    <children>
+      <component id="bc999" class="javax.swing.JLabel" binding="ordr_label">
+        <constraints>
+          <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Heiti SC" size="72"/>
+          <horizontalAlignment value="0"/>
+          <horizontalTextPosition value="0"/>
+          <iconTextGap value="0"/>
+          <inheritsPopupMenu value="false"/>
+          <text value="ORDR"/>
+        </properties>
+      </component>
+      <component id="48905" class="javax.swing.JLabel" binding="contact_label">
+        <constraints>
+          <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Heiti SC" size="18"/>
+          <text value="CONTACT US"/>
+        </properties>
+      </component>
+      <grid id="df00" binding="info_panel" layout-manager="GridLayoutManager" row-count="1" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false">
+            <preferred-size width="24" height="63"/>
+          </grid>
+        </constraints>
+        <properties>
+          <background color="-4539718"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <component id="c2288" class="javax.swing.JLabel" binding="ContactDetail_Label">
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Tel: 020 8842 4555 / 020 7770 1234"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <component id="4f410" class="javax.swing.JLabel" binding="form_label">
+        <constraints>
+          <grid row="3" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <font name="Heiti SC" size="18"/>
+          <text value="CONTACT FORM"/>
+        </properties>
+      </component>
+      <grid id="c7f8b" binding="form_panel" layout-manager="GridLayoutManager" row-count="3" column-count="2" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+        <margin top="0" left="0" bottom="0" right="0"/>
+        <constraints>
+          <grid row="5" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <background color="-4408132"/>
+        </properties>
+        <border type="none"/>
+        <children>
+          <grid id="6aab5" binding="leftForm_panel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="4a5bc" class="javax.swing.JLabel" binding="firstname_label">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="Heiti SC" size="12"/>
+                  <text value="First Name"/>
+                </properties>
+              </component>
+              <component id="4d757" class="javax.swing.JLabel" binding="surname_label">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="Heiti SC" size="12"/>
+                  <text value="Surname"/>
+                </properties>
+              </component>
+              <component id="ad336" class="javax.swing.JLabel" binding="email_label">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="Heiti SC" size="12"/>
+                  <text value="Email"/>
+                </properties>
+              </component>
+              <component id="7d1" class="javax.swing.JLabel" binding="comment_label">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+                </constraints>
+                <properties>
+                  <font name="Heiti SC" size="12"/>
+                  <text value="How can we assist you?"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <grid id="3b338" binding="rightForm_panel" layout-manager="GridLayoutManager" row-count="4" column-count="1" same-size-horizontally="false" same-size-vertically="false" hgap="-1" vgap="-1">
+            <margin top="0" left="0" bottom="0" right="0"/>
+            <constraints>
+              <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="3" hsize-policy="3" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties/>
+            <border type="none"/>
+            <children>
+              <component id="44a5b" class="javax.swing.JTextField" binding="firstnameFill">
+                <constraints>
+                  <grid row="0" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1184275"/>
+                  <enabled value="true"/>
+                  <font name="Abadi MT Condensed Light" size="10"/>
+                  <foreground color="-12105913"/>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="a375f" class="javax.swing.JTextField" binding="surnameFill">
+                <constraints>
+                  <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1184275"/>
+                  <enabled value="true"/>
+                  <font name="Abadi MT Condensed Light" size="10"/>
+                  <foreground color="-12105913"/>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="4a578" class="javax.swing.JTextField" binding="emailFill">
+                <constraints>
+                  <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1184275"/>
+                  <enabled value="true"/>
+                  <font name="Abadi MT Condensed Light" size="10"/>
+                  <foreground color="-12105913"/>
+                  <text value=""/>
+                </properties>
+              </component>
+              <component id="df3f2" class="javax.swing.JTextField" binding="commentFill">
+                <constraints>
+                  <grid row="3" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="6" anchor="8" fill="1" indent="0" use-parent-layout="false">
+                    <preferred-size width="150" height="-1"/>
+                  </grid>
+                </constraints>
+                <properties>
+                  <background color="-1184275"/>
+                  <enabled value="true"/>
+                  <font name="Abadi MT Condensed Light" size="10"/>
+                  <foreground color="-12105913"/>
+                </properties>
+              </component>
+            </children>
+          </grid>
+          <component id="ecedd" class="javax.swing.JCheckBox" binding="subscribe_checkbox">
+            <constraints>
+              <grid row="1" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Select to subscribe to weekly newsletters!"/>
+            </properties>
+          </component>
+          <component id="dde2f" class="javax.swing.JButton" binding="submit_button">
+            <constraints>
+              <grid row="2" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="4" fill="0" indent="0" use-parent-layout="false"/>
+            </constraints>
+            <properties>
+              <text value="Submit"/>
+            </properties>
+          </component>
+        </children>
+      </grid>
+      <component id="ecec6" class="javax.swing.JLabel" binding="errorLbl">
+        <constraints>
+          <grid row="4" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="0" fill="0" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties>
+          <foreground color="-393216"/>
+          <horizontalAlignment value="0"/>
+          <text value=""/>
+        </properties>
+      </component>
+    </children>
+  </grid>
+</form>
