@@ -11,6 +11,7 @@ public class ApplicationManager {
     private static final LogInViewController logInVC = new LogInViewController();
     private static final CreateAccountViewController createAccVC = new CreateAccountViewController();
     private static final ItemListView listVC = new ItemListView();
+    private static final BasketViewController basketVC = new BasketViewController();
     private static ViewController currentVC = logInVC;
 
     public static void applicationDidLaunch() {
@@ -63,9 +64,23 @@ public class ApplicationManager {
                 }
             }
         });
+        final JButton basketButton = new JButton("Basket");
+        basketButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (currentVC != basketVC) {
+                    mainView.remove(currentVC.getView());
+                    currentVC = basketVC;
+                    mainView.add(basketVC.getView(),  BorderLayout.CENTER);
+                    mainView.revalidate();
+                    mainView.repaint();
+                }
+            }
+        });
         nav.add(logInButton, BorderLayout.NORTH);
         nav.add(createButton, BorderLayout.NORTH);
         nav.add(listButton, BorderLayout.NORTH);
+        nav.add(basketButton, BorderLayout.NORTH);
         //Add nav bar
         mainView.add(nav, BorderLayout.NORTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
