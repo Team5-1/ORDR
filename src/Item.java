@@ -46,14 +46,10 @@ public class Item extends SQLObject {
         query.put(kID_COLUMN_NAME, ID);
         DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(query, getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
             @Override
-            public void succeeded(ResultSet results) {
-                try {
-                    results.next();
-                    Item item = itemFromResultSet(results);
-                    handler.success(item);
-                } catch (SQLException e) {
-                    handler.failed(e);
-                }
+            public void succeeded(ResultSet results) throws SQLException {
+                results.next();
+                Item item = itemFromResultSet(results);
+                handler.success(item);
             }
 
             @Override
@@ -72,17 +68,13 @@ public class Item extends SQLObject {
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
         DatabaseManager.fetchAllRecordsForTableInBackground(getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
             @Override
-            public void succeeded(ResultSet results) {
+            public void succeeded(ResultSet results) throws SQLException {
                 ArrayList<Item> items = new ArrayList<Item>();
-                try {
-                    while (results.next()) {
-                        Item item = itemFromResultSet(results);
-                        items.add(item);
-                    }
-                    handler.succeeded(items);
-                } catch (SQLException e) {
-                    handler.failed(e);
+                while (results.next()) {
+                    Item item = itemFromResultSet(results);
+                    items.add(item);
                 }
+                handler.succeeded(items);
             }
 
             @Override
@@ -128,7 +120,7 @@ public class Item extends SQLObject {
                     fetchedPrice = price;
                     price = null;
                 }
-                if (stockQty!= null) {
+                if (stockQty != null) {
                     fetchedStockQty = stockQty;
                     stockQty = null;
                 }
@@ -305,25 +297,21 @@ public class Item extends SQLObject {
                         changes.put(kITEM_ID_COLUMN_NAME, item.getID());
                         DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(changes, getSQLTableName(BasketItem.class), new DatabaseManager.QueryCompletionHandler() {
                             @Override
-                            public void succeeded(ResultSet results) {
-                                try {
-                                    results.next();
-                                    bItem.ID = results.getInt(kID_COLUMN_NAME);
-                                    bItem.save(new DatabaseManager.SaveCompletionHandler() {
-                                        @Override
-                                        public void succeeded() {
-                                            bItem.fetchedQuantity = bItem.quantity;
-                                            bItem.quantity = 0;
-                                        }
+                            public void succeeded(ResultSet results) throws SQLException {
+                                results.next();
+                                bItem.ID = results.getInt(kID_COLUMN_NAME);
+                                bItem.save(new DatabaseManager.SaveCompletionHandler() {
+                                    @Override
+                                    public void succeeded() {
+                                        bItem.fetchedQuantity = bItem.quantity;
+                                        bItem.quantity = 0;
+                                    }
 
-                                        @Override
-                                        public void sqlException(SQLException exception) {
-                                            //TODO: post alert that the basket item was unable to save
-                                        }
-                                    });
-                                } catch (SQLException e) {
-                                    System.out.println(e.getLocalizedMessage());
-                                }
+                                    @Override
+                                    public void sqlException(SQLException exception) {
+                                           //TODO: post alert that the basket item was unable to save
+                                    }
+                                });
                             }
 
                             @Override

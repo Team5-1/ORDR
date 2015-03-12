@@ -300,7 +300,9 @@ public class DatabaseManager {
                 threadException(e);
             }
         }
+
         abstract public void sqlException(SQLException exception);
+
         public void threadException(Exception exception) {
             exception.printStackTrace();
             System.out.println(exception.getLocalizedMessage());
@@ -312,7 +314,7 @@ public class DatabaseManager {
     }
 
     public static abstract class QueryCompletionHandler extends SQLCompletionHandler {
-        abstract public void succeeded(ResultSet results);
+        abstract public void succeeded(ResultSet results) throws SQLException;
         abstract public void noResults();
     }
 
