@@ -2,6 +2,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.concurrent.Callable;
 
 /**
@@ -298,7 +299,48 @@ public class Item extends SQLObject {
 
                 @Override
                 public void sqlException(SQLException exception) {
-                    //TODO: handle this
+                    if (exception.getErrorCode() == 1062) {
+                        HashMap<String, Object> changes = new HashMap<String, Object>(2);
+                        changes.put(kUSER_ID_COLUMN_NAME, userID);
+                        changes.put(kITEM_ID_COLUMN_NAME, item.getID());
+                        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(changes, getSQLTableName(BasketItem.class), new DatabaseManager.QueryCompletionHandler() {
+                            @Override
+                            public void succeeded(ResultSet results) {
+                                try {
+                                    results.next();
+                                    bItem.ID = results.getInt(kID_COLUMN_NAME);
+                                    bItem.save(new DatabaseManager.SaveCompletionHandler() {
+                                        @Override
+                                        public void succeeded() {
+                                            bItem.fetchedQuantity = bItem.quantity;
+                                            bItem.quantity = 0;
+                                        }
+
+                                        @Override
+                                        public void sqlException(SQLException exception) {
+                                            //TODO: post alert that the basket item was unable to save
+                                        }
+                                    });
+                                } catch (SQLException e) {
+                                    System.out.println(e.getLocalizedMessage());
+                                }
+                            }
+
+                            @Override
+                            public void noResults() {
+                                //This shouldn't happen because we've just tried to inset and got a duplicate error
+                                //If it does, KABOOM! MASSIVE EDGE CASE!
+                            }
+
+                            @Override
+                            public void sqlException(SQLException exception) {
+                                //TODO: post alert that the basket item was unable to save
+                            }
+                        });
+                    } else {
+                        System.out.println(exception.getLocalizedMessage());
+                        //TODO: post alert that the basket item was unable to save
+                    }
                 }
             });
 

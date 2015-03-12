@@ -257,7 +257,7 @@ public class DatabaseManager {
     }
 
 
-    public static void updateFieldsForRecord(final String tableName, final String recordKeyName, final int recordKey, final HashMap<String, Object> columnsAndValues, final SaveCompletionHandler handler) {
+    public static void updateFieldsForRecord(final String tableName, final String recordIDColumnName, final int recordID, final HashMap<String, Object> columnsAndValues, final SaveCompletionHandler handler) {
         Runnable query = new Runnable() {
             @Override
             public void run() {
@@ -267,7 +267,7 @@ public class DatabaseManager {
                     stmString +=  key + " = ?, ";
                     values.add(columnsAndValues.get(key));
                 }
-                stmString += "date_updated = NOW() WHERE " + recordKeyName + " = " + String.format("%d", recordKey);
+                stmString += "date_updated = NOW() WHERE " + recordIDColumnName + " = " + String.format("%d", recordID);
                 try {
                     PreparedStatement stm = sharedManager.dbConnection.prepareStatement(stmString);
                     for (int i = 0; i < values.size(); i++) {
