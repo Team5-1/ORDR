@@ -144,7 +144,7 @@ public class User extends SQLObject {
                 String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
                 String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
                 PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(stmString);
-                stm.execute(); //Insert user
+                stm.execute(); //Insert user. If email address already exists an exception will be thrown at this point
                 return DatabaseManager.getSharedDbConnection().prepareStatement("SELECT user_id FROM users WHERE email = '" + emailAddress + "'").executeQuery();
             }
         };
@@ -175,9 +175,9 @@ public class User extends SQLObject {
                 if (SQLException.class.isAssignableFrom(exception.getClass())) {
                     SQLException sqlException = (SQLException) exception;
                     if (sqlException.getErrorCode() == 1062) {
-                        handler.emailAddressTaken();
+                        handler.emailAddressTaken(); //duplicate user
                     } else {
-                        handler.sqlException(sqlException);
+                        handler.sqlException(sqlException); //error with insert or resulting user query
                     }
                 } else {
                     handler.threadException(exception);

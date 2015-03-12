@@ -283,7 +283,7 @@ public class Item extends SQLObject {
             if (userID == 0 || item == null || item.getID() == 0 || quantity == 0) return null;
             final BasketItem bItem = new BasketItem(item, quantity);
 
-            HashMap<String, Object> fieldsAndValues = new HashMap<String, Object>(4);
+            HashMap<String, Object> fieldsAndValues = new HashMap<String, Object>(3);
             fieldsAndValues.put(kUSER_ID_COLUMN_NAME, userID);
             fieldsAndValues.put(kITEM_ID_COLUMN_NAME, item.getID());
             fieldsAndValues.put(kQUANTITY_COLUMN_NAME, quantity);

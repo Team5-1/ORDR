@@ -40,7 +40,7 @@ public class DatabaseManager {
                 for (String key : columnsAndValues.keySet()) {
                     cols += key;
                     if (i == columnCount) {
-                        cols += " ";
+                        cols += ") ";
                         values += "?)";
                     } else {
                         cols += ", ";
@@ -50,15 +50,19 @@ public class DatabaseManager {
                     i++;
                 }
                 String stmString =  insert + cols + values;
-                ResultSet result = null;
+                ResultSet insertedRecordID = null;
                 try {
                     PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
-                    stm.execute();
-                    result =  getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery(); //Return results
+                    for (i = 0; i < orderedValues.size(); i++) {
+                        stm.setObject(i + 1, orderedValues.get(i));
+                    }
+                    stm.execute(); //Execute insert. Throws exception and stops here if issue
+                    insertedRecordID =  getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
                 } catch (SQLException e) {
+                    System.out.println(e.getLocalizedMessage());
                     handler.sqlException(e);
                 }
-                return result; //If we got here shit hit the fan and an e
+                return insertedRecordID;
             }
         };
 
