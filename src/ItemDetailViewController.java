@@ -6,7 +6,7 @@ import java.awt.event.ItemListener;
 /**
  * Created by MaywandA on 19/02/15.
  */
-public class ItemView {
+public class ItemDetailViewController {
     private JLabel itemName;
     private JLabel price;
     private JLabel itemDescription;
@@ -18,7 +18,7 @@ public class ItemView {
     private JLabel logoLabel;
     final private Item item;
 
-    public ItemView(Item item) {
+    public ItemDetailViewController(Item item) {
         this.item = item;
         populateField();
         initialiseView();
