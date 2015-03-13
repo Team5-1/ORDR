@@ -6,7 +6,7 @@ import javax.swing.*;
 public class ApplicationManager {
     public static void main(String[] args) {
         JFrame frame = new JFrame("Contact Form");
-        // ContactForm vc = new ContactForm();
+         //ContactForm vc = new ContactForm();
         //frame.setContentPane(vc.getView());
         //frame.setSize(600, 500);
         //frame.setTitle("Add Product");
@@ -14,7 +14,7 @@ public class ApplicationManager {
         //frame.setVisible(true);
 
         Item item = new Item("Arsenal Home Jersey", "Arsenal 2014/15 Home red Jersey. PUMA dryCELL. ");
-        item.setPrice(42.99);
+        item.setPrice(50.00);
         ItemView itemView = new ItemView(item);
         frame.setContentPane(itemView.getView());
         frame.setSize(500, 500);

@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -13,13 +14,22 @@ public class ItemView {
     private JPanel panel;
     private JLabel priceTotalLabel;
     private JButton BasketButton;
+    private JPanel BottomPanel;
     private JLabel logoLabel;
-    private Item item;
+    final private Item item;
 
-    public ItemView(final Item item) {
-
+    public ItemView(Item item) {
         this.item = item;
         populateField();
+        initialiseView();
+    }
+
+    public void initialiseView() {
+        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
+        Image img = icon.getImage();
+        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
+        ImageIcon newIcon = new ImageIcon(newImage);
+        logoLabel.setIcon(newIcon);
         quantityCmb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -37,6 +47,7 @@ public class ItemView {
         itemDescription.setText(item.getDescription());
         price.setText("£ " + item.getPrice());
     }
+
 
     public JPanel getView() {
         return this.panel;
