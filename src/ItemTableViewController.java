@@ -79,7 +79,7 @@ public class ItemTableViewController implements ViewController {
 
     @Override
     public JPanel getView() {
-        return Table;
+        return table;
     }
 }
 
