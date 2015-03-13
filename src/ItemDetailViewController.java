@@ -6,7 +6,7 @@ import java.awt.event.ItemListener;
 /**
  * Created by MaywandA on 19/02/15.
  */
-public class ItemDetailViewController {
+public class ItemDetailViewController implements ViewController {
     private JLabel itemName;
     private JLabel price;
     private JLabel itemDescription;
