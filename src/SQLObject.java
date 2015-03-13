@@ -18,8 +18,9 @@ public abstract class SQLObject {
         }
     }
 
-    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getName() + "s"; }
+    public static String getSQLTableName(Class<? extends  SQLObject> SQLObjectSubclass) { return SQLObjectSubclass.getSimpleName() + "s"; }
 
+    //TODO: Couldn't this be overridden in sublclasses so they pass themselves.class instead of passing in the class in every call
     public String getSQLTableName() { return getSQLTableName(this.getClass()); }
 
     abstract public HashMap<String, Object> changes();
