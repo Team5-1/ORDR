@@ -10,13 +10,13 @@ import java.util.ArrayList;
  * Created by danyalaboobakar on 28/01/15.
  */
 
-public class itemTableViewController {
+public class ItemTableViewController {
 
     public JPanel table;
     private JTable itemsTable;
     private JScrollPane scrollPane;
 
-    public itemTableViewController() {
+    public ItemTableViewController() {
         //Prevent movement of columns
         itemsTable.getTableHeader().setReorderingAllowed(false);
 
