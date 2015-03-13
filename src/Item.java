@@ -2,8 +2,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Objects;
-import java.util.concurrent.Callable;
 
 /**
  * Created by kylejm on 25/01/15.
@@ -44,7 +42,8 @@ public class Item extends SQLObject {
     public static void fetchItemWithIDInBackground(int ID, final SingleItemCompletionHandler handler) {
         HashMap<String, Object> query = new HashMap<String, Object>();
         query.put(kID_COLUMN_NAME, ID);
-        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(query, getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
+
+        DatabaseManager.QueryCompletionHandler queryHandler = new DatabaseManager.QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) throws SQLException {
                 results.next();
@@ -53,20 +52,17 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void sqlException(SQLException exception) {
+            public void failed(SQLException exception) {
                 handler.failed(exception);
             }
+        };
 
-            @Override
-            public void noResults() {
-                handler.noResult();
-            }
-
-        });
+        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(query, getSQLTableName(Item.class), queryHandler);
     }
 
     public static void fetchAllItemsInBackground(final MultipleItemCompletionHandler handler) {
-        DatabaseManager.fetchAllRecordsForTableInBackground(getSQLTableName(Item.class), new DatabaseManager.QueryCompletionHandler() {
+
+        DatabaseManager.QueryCompletionHandler queryHandler = new DatabaseManager.QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) throws SQLException {
                 ArrayList<Item> items = new ArrayList<Item>();
@@ -78,16 +74,12 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void sqlException(SQLException exception) {
+            public void failed(SQLException exception) {
                 handler.failed(exception);
             }
+        };
 
-            @Override
-            public void noResults() {
-                handler.noResults();
-            }
-
-        });
+        DatabaseManager.fetchAllRecordsForTableInBackground(getSQLTableName(Item.class), queryHandler);
     }
 
     //TODO: Perhaps want this method to be declared in SQLObject so all SQLObjects have to implement it
@@ -128,8 +120,8 @@ public class Item extends SQLObject {
             }
 
             @Override
-            public void sqlException(SQLException exception) {
-                handler.sqlException(exception);
+            public void failed(SQLException exception) {
+                handler.failed(exception);
             }
         });
     }
@@ -191,16 +183,12 @@ public class Item extends SQLObject {
 
 
     //Item completion handler
-    public interface SingleItemCompletionHandler {
+    public interface SingleItemCompletionHandler extends DatabaseManager.SQLExceptionHandler {
         public void success(Item item);
-        public void failed(SQLException exception);
-        public void noResult();
     }
 
-    public interface MultipleItemCompletionHandler {
+    public interface MultipleItemCompletionHandler extends DatabaseManager.SQLExceptionHandler {
         public void succeeded(ArrayList<Item> items);
-        public void failed(SQLException exception);
-        public void noResults();
     }
 
     public static class BasketItem extends SQLObject {
@@ -227,49 +215,51 @@ public class Item extends SQLObject {
             this.quantity = quantity;
         }
 
-        public static void fetchAllBasketItemsForUser(User user, final MultipleBasketItemCompletionHandler handler) {
+        public static void fetchAllBasketItemsForUser(final User user, final MultipleBasketItemCompletionHandler handler) {
             if (user.getID() == 0) return;
 
-            String baskItemTableName = getSQLTableName(BasketItem.class);
-            String itemTableName = getSQLTableName(Item.class);
-            String select = "SELECT * FROM " + baskItemTableName;
-            String join = String.format(" LEFT JOIN %s ON %s.%s = %s.%s ", itemTableName, itemTableName, kITEM_ID_COLUMN_NAME, baskItemTableName, kITEM_ID_COLUMN_NAME);
-            String where = String.format("WHERE %s.%s = %d", baskItemTableName, kUSER_ID_COLUMN_NAME, user.getID());
-            final String stmString = select + join + where;
-
-            Callable<ResultSet> query = new Callable<ResultSet>() {
+            SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
                 @Override
-                public ResultSet call() throws Exception {
+                public ResultSet call() throws SQLException {
+                    String baskItemTableName = getSQLTableName(BasketItem.class);
+                    String itemTableName = getSQLTableName(Item.class);
+                    String select = "SELECT * FROM " + baskItemTableName;
+                    String join = String.format(" LEFT JOIN %s ON %s.%s = %s.%s ", itemTableName, itemTableName, kITEM_ID_COLUMN_NAME, baskItemTableName, kITEM_ID_COLUMN_NAME);
+                    String where = String.format("WHERE %s.%s = %d", baskItemTableName, kUSER_ID_COLUMN_NAME, user.getID());
+                    String stmString = select + join + where;
                     return DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
                 }
             };
 
-            MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
+            DatabaseManager.QueryCompletionHandler callback = new DatabaseManager.QueryCompletionHandler() {
                 @Override
-                public void complete(ResultSet results) {
-                    try {
-                        HashMap<Integer, BasketItem> bItems = new HashMap<Integer, BasketItem>();
-                        while (results.next()) {
-                            BasketItem bItem = new BasketItem();
-                            bItem.ID = results.getInt(kID_COLUMN_NAME);
-                            bItem.fetchedQuantity = results.getInt(kQUANTITY_COLUMN_NAME);
-                            bItem.item = itemFromResultSet(results);
-                            bItems.put(bItem.item.getID(), bItem);
-                        }
-                        handler.succeeded(bItems);
-                    } catch (SQLException e) {
-                        handler.sqlException(e);
+                public void succeeded(ResultSet results) throws SQLException {
+                    HashMap<Integer, BasketItem> bItems = new HashMap<Integer, BasketItem>();
+                    while (results.next()) {
+                        BasketItem bItem = new BasketItem();
+                        bItem.ID = results.getInt(kID_COLUMN_NAME);
+                        bItem.fetchedQuantity = results.getInt(kQUANTITY_COLUMN_NAME);
+                        bItem.item = itemFromResultSet(results);
+                        bItems.put(bItem.item.getID(), bItem);
                     }
+                    handler.succeeded(bItems);
                 }
 
                 @Override
-                public void failed(Exception exception) {
-                    handler.handleException(exception);
+                public void failed(SQLException exception) {
+                    handler.failed(exception);
                 }
             };
 
-            BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+            BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
         }
+
+        DatabaseManager.SQLExceptionHandler sqlExceptionHandler = new DatabaseManager.SQLExceptionHandler() {
+            @Override
+            public void failed(SQLException exception) {
+
+            }
+        };
 
         public static BasketItem makeBasketItem(final int userID, final Item item, final int quantity) {
             //TODO: Handle duplicate here
@@ -281,7 +271,7 @@ public class Item extends SQLObject {
             fieldsAndValues.put(kITEM_ID_COLUMN_NAME, item.getID());
             fieldsAndValues.put(kQUANTITY_COLUMN_NAME, quantity);
 
-            DatabaseManager.createRecordInBackground(fieldsAndValues, getSQLTableName(BasketItem.class), new DatabaseManager.CreateCompletionHandler() {
+            DatabaseManager.CreateCompletionHandler createHandler = new DatabaseManager.CreateCompletionHandler() {
                 @Override
                 public void succeeded(int ID) {
                     bItem.ID = ID;
@@ -290,47 +280,38 @@ public class Item extends SQLObject {
                 }
 
                 @Override
-                public void sqlException(SQLException exception) {
+                public void failed(SQLException exception) {
+                    final DatabaseManager.SQLExceptionHandler saveFailure = new DatabaseManager.SQLExceptionHandler() {
+                        @Override
+                        public void failed(SQLException exception) {
+                            //TODO: post alert that the basket item was unable to save
+                        }
+                    };
                     if (exception.getErrorCode() == 1062) {
                         HashMap<String, Object> changes = new HashMap<String, Object>(2);
                         changes.put(kUSER_ID_COLUMN_NAME, userID);
                         changes.put(kITEM_ID_COLUMN_NAME, item.getID());
-                        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(changes, getSQLTableName(BasketItem.class), new DatabaseManager.QueryCompletionHandler() {
+                        DatabaseManager.fetchAllFieldsForMatchingRecordsInBackground(changes, getSQLTableName(BasketItem.class), new DatabaseManager.QuerySuccessHandler(saveFailure) {
                             @Override
                             public void succeeded(ResultSet results) throws SQLException {
                                 results.next();
                                 bItem.ID = results.getInt(kID_COLUMN_NAME);
-                                bItem.save(new DatabaseManager.SaveCompletionHandler() {
+                                bItem.save(new DatabaseManager.SaveSuccessHandler(saveFailure) {
                                     @Override
                                     public void succeeded() {
                                         bItem.fetchedQuantity = bItem.quantity;
                                         bItem.quantity = 0;
                                     }
-
-                                    @Override
-                                    public void sqlException(SQLException exception) {
-                                           //TODO: post alert that the basket item was unable to save
-                                    }
                                 });
-                            }
-
-                            @Override
-                            public void noResults() {
-                                //This shouldn't happen because we've just tried to inset and got a duplicate error
-                                //If it does, KABOOM! MASSIVE EDGE CASE!
-                            }
-
-                            @Override
-                            public void sqlException(SQLException exception) {
-                                //TODO: post alert that the basket item was unable to save
                             }
                         });
                     } else {
-                        System.out.println(exception.getLocalizedMessage());
-                        //TODO: post alert that the basket item was unable to save
+                        saveFailure.failed(exception);
                     }
                 }
-            });
+            };
+
+            DatabaseManager.createRecordInBackground(fieldsAndValues, getSQLTableName(BasketItem.class), createHandler);
 
             return bItem;
         }
@@ -368,7 +349,7 @@ public class Item extends SQLObject {
         //Setters
         public void setQuantity(int quantity) { this.quantity = (quantity == fetchedQuantity) ? 0 : quantity; }
 
-        public static abstract class MultipleBasketItemCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+        public interface MultipleBasketItemCompletionHandler extends DatabaseManager.SQLExceptionHandler {
             abstract public void succeeded(HashMap<Integer, BasketItem> basketItems);
         }
     }

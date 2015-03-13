@@ -49,11 +49,6 @@ public class ItemListView implements ViewController {
             public void failed(SQLException exception) {
 
             }
-
-            @Override
-            public void noResults() {
-                //TODO: handle
-            }
         });
         itemsTable.addMouseListener(new MouseAdapter() {
             @Override

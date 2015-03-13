@@ -43,7 +43,7 @@ public class CreateAccountViewController implements ViewController {
                     }
 
                     @Override
-                    public void sqlException(SQLException exception) {
+                    public void failed(SQLException exception) {
                         System.out.println(exception.getLocalizedMessage());
                     }
                 });

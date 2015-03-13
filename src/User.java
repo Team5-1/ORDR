@@ -2,7 +2,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -64,60 +63,48 @@ public class User extends SQLObject {
             return;
         }
 
-
-
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 String select = String.format("SELECT Users.%s, Users.%s, Users.%s", kID_COLUMN_NAME, kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME);
                 String from = String.format(" FROM %s ", getSQLTableName(User.class));
                 String where = String.format("WHERE Users.%s = '%s' AND Users.%s = MD5('%s')", kEMAIL_ADDRESS_COLUMN_NAME, emailAddress, kPASSWORD_COLUMN_NAME, password);
                 String stmString = select + from + where;
-                ResultSet userDetails = null;
-                try {
-                    userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
+                ResultSet userDetails = DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
                 return userDetails;
             }
         };
 
-
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
+        DatabaseManager.QueryCompletionHandler callback = new DatabaseManager.QueryCompletionHandler() {
             @Override
-            public void complete(ResultSet userDetails) {
-                try {
-                    if (userDetails.next()) {
-                        final User user = new User(userDetails.getInt("user_id"), userDetails.getString("first_name"), userDetails.getString("last_name"), emailAddress);
-                        DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
-                        user.refreshBasketInBackground(new BasketRefreshCompletionHandler() {
-                            @Override
-                            public void succeeded() {
-                                currentUser = user;
-                                handler.succeeded(user);
-                            }
+            public void succeeded(ResultSet results) throws SQLException {
+                if (results.next()) {
+                    final User user = new User(results.getInt("user_id"), results.getString("first_name"), results.getString("last_name"), emailAddress);
+                    DatabaseManager.getSharedDbConnection().prepareStatement(String.format("UPDATE users SET %s = NOW() WHERE %s = %d", kLAST_LOGGED_IN_FIELD, kID_COLUMN_NAME, user.ID)).execute();
+                    user.refreshBasketInBackground(new BasketRefreshCompletionHandler() {
+                        @Override
+                        public void succeeded() {
+                            currentUser = user;
+                            handler.succeeded(user);
+                        }
 
-                            @Override
-                            public void sqlException(SQLException exception) {
-                                handler.sqlException(exception);
+                        @Override
+                            public void failed(SQLException exception) {
+                                handler.failed(exception);
                             }
                         });
                     } else {
                         handler.emailAddressOrPasswordIncorrect();
                     }
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
             }
 
             @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
+            public void failed(SQLException exception) {
+                handler.failed(exception);
             }
         };
 
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
 
     }
 
@@ -136,10 +123,9 @@ public class User extends SQLObject {
             return;
         }
 
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
-
+            public ResultSet call() throws SQLException {
                 String columns = String.format("(%s, %s, %s, %s)", kFIRST_NAME_COLUMN_NAME, kLAST_NAME_COLUMN_NAME, kEMAIL_ADDRESS_COLUMN_NAME, kPASSWORD_COLUMN_NAME);
                 String values = String.format("VALUES ('%s', '%s', '%s', MD5('%s'))", firstName, lastName, emailAddress, password);
                 String stmString = "INSERT INTO " + getSQLTableName(User.class) + columns + values;
@@ -150,42 +136,32 @@ public class User extends SQLObject {
         };
 
         final User selfPointer = this;
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
+        DatabaseManager.QueryCompletionHandler callback = new DatabaseManager.QueryCompletionHandler() {
             @Override
-            public void complete(ResultSet idResult) {
-                try {
-                    idResult.next();
-                    ID = idResult.getInt(kID_COLUMN_NAME);
-                    fetchedFirstName = firstName;
-                    firstName = null;
-                    fetchedLastName = lastName;
-                    lastName = null;
-                    fetchedEmailAddress = emailAddress;
-                    emailAddress = null;
-                    currentUser = selfPointer;
-                    handler.succeeded();
-                    //TODO: do you have to close queries when you're done with them?
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
+            public void succeeded(ResultSet results) throws SQLException {
+                results.next();
+                ID = results.getInt(kID_COLUMN_NAME);
+                fetchedFirstName = firstName;
+                firstName = null;
+                fetchedLastName = lastName;
+                lastName = null;
+                fetchedEmailAddress = emailAddress;
+                emailAddress = null;
+                currentUser = selfPointer;
+                handler.succeeded();
             }
 
             @Override
-            public void failed(Exception exception) {
-                if (SQLException.class.isAssignableFrom(exception.getClass())) {
-                    SQLException sqlException = (SQLException) exception;
-                    if (sqlException.getErrorCode() == 1062) {
-                        handler.emailAddressTaken(); //duplicate user
-                    } else {
-                        handler.sqlException(sqlException); //error with insert or resulting user query
-                    }
+            public void failed(SQLException exception) {
+                if (exception.getErrorCode() == 1062) {
+                    handler.emailAddressTaken(); //duplicate user
                 } else {
-                    handler.threadException(exception);
+                    handler.failed(exception); //error with insert or resulting user query
                 }
             }
         };
 
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
     }
 
     public void refreshBasketInBackground(final BasketRefreshCompletionHandler handler) {
@@ -198,8 +174,8 @@ public class User extends SQLObject {
             }
 
             @Override
-            public void sqlException(SQLException exception) {
-                handler.sqlException(exception);
+            public void failed(SQLException exception) {
+                handler.failed(exception);
             }
         });
     }
@@ -275,21 +251,21 @@ public class User extends SQLObject {
         return basketItems;
     }
 
-    public static abstract class LogInCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+    public interface LogInCompletionHandler extends DatabaseManager.SQLExceptionHandler {
         abstract public void succeeded(User user);
         abstract public void emailAddressOrPasswordIncorrect();
         abstract public void passwordTooShort();
         abstract public void emailFormatIncorrect();
     }
 
-    public static abstract class SignUpCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+    public interface SignUpCompletionHandler extends DatabaseManager.SQLExceptionHandler {
         abstract public void succeeded();
         abstract public void passwordTooShort();
         abstract public void emailFormatIncorrect();
         abstract public void emailAddressTaken();
     }
 
-    public static abstract class BasketRefreshCompletionHandler extends DatabaseManager.SQLCompletionHandler {
+    public interface BasketRefreshCompletionHandler extends DatabaseManager.SQLExceptionHandler {
         abstract public void succeeded();
     }
 }

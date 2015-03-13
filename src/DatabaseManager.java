@@ -1,7 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.concurrent.Callable;
 
 /**
  * Created by kylejm on 24/01/15.
@@ -23,14 +22,13 @@ public class DatabaseManager {
             System.out.println("ERROR: MySQL Connection Failed!");
             e.printStackTrace();
         }
-        
     }
 
     public static void createRecordInBackground(final HashMap<String, Object> columnsAndValues, final String tableName, final CreateCompletionHandler handler) {
         //Create statement callable
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 String insert = "INSERT INTO " + tableName;
                 String cols = " (";
                 String values = " VALUES (";
@@ -51,75 +49,46 @@ public class DatabaseManager {
                 }
                 String stmString =  insert + cols + values;
                 ResultSet insertedRecordID = null;
-                try {
-                    PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
-                    for (i = 0; i < orderedValues.size(); i++) {
-                        stm.setObject(i + 1, orderedValues.get(i));
-                    }
-                    stm.execute(); //Execute insert. Throws exception and stops here if issue
-                    insertedRecordID =  getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
-                } catch (SQLException e) {
-                    System.out.println(e.getLocalizedMessage());
-                    handler.sqlException(e);
+                PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
+                for (i = 0; i < orderedValues.size(); i++) {
+                    stm.setObject(i + 1, orderedValues.get(i));
                 }
-                return insertedRecordID;
+                stm.execute(); //Execute insert. Throws exception and stops here if issue
+                insertedRecordID =  getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
+                return insertedRecordID; //If return null, the callback won't get called
             }
         };
 
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
+        QueryCompletionHandler callback = new QueryCompletionHandler() {
             @Override
-            public void complete(ResultSet results) {
-                try {
-                    handler.succeeded(results.getInt(1));
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
-
+            public void succeeded(ResultSet results) throws SQLException {
+                handler.succeeded(results.getInt(1));
             }
 
             @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
+            public void failed(SQLException exception) {
+                handler.failed(exception);
             }
         };
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
     }
 
     public static void fetchAllRecordsForTableInBackground(final String tableName, final QueryCompletionHandler handler) {
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 return  getSharedDbConnection().prepareStatement("SELECT * FROM " + tableName).executeQuery();
             }
         };
 
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
-            @Override
-            public void complete(ResultSet results) {
-                try {
-                    if (results.next()) {
-                        results.beforeFirst();
-                        handler.succeeded(results);
-                    } else {
-                        handler.noResults();
-                    }
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
-            }
-
-            @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
-            }
-        };
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, handler));
     }
 
     public static void fetchAllFieldsForMatchingRecordsInBackground(final HashMap<String, Object> fieldsAndValuesToMatch, final String tableName, final QueryCompletionHandler handler) {
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 String stmString = String.format("SELECT * FROM %s WHERE ", tableName);
                 int fieldCount = fieldsAndValuesToMatch.size();
                 int i = 1;
@@ -138,34 +107,14 @@ public class DatabaseManager {
             }
         };
 
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
-            @Override
-            public void complete(ResultSet results) {
-                try {
-                    if (results.next()) {
-                        results.beforeFirst();
-                        handler.succeeded(results);
-                    } else {
-                        handler.noResults();
-                    }
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
-            }
-
-            @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
-            }
-        };
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, handler));
     }
 
     //TODO: this below method might not be needed. Just always fetch all... there aren't that many columns in records
     public static void fetchSpecifiedFieldsForAllRecordsInBackground(final ArrayList<String> fields, final String tableName, final QueryCompletionHandler handler) {
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 String stmString = "SELECT ";
                 int fieldCount = fields.size();
                 int i = 1;
@@ -178,35 +127,14 @@ public class DatabaseManager {
             }
         };
 
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
-            @Override
-            public void complete(ResultSet results) {
-                try {
-                    if (results.next()) {
-                        results.beforeFirst();
-                        handler.succeeded(results);
-                    } else {
-                        handler.noResults();
-                    }
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
-            }
-
-            @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
-            }
-        };
-
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, handler));
     };
 
     //TODO: This method might not be needed. SELECT LAST_INSERT_ID() is used instead to get the ID of a newly created record
     public static void fetchSpecifiedFieldsForMatchingRecordsInBackground(final ArrayList<String> fieldsToFetch, final HashMap<String, Object> fieldsAndValuesToMatch, final String tableName, final QueryCompletionHandler handler) {
-        Callable<ResultSet> query = new Callable<ResultSet>() {
+        SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
-            public ResultSet call() throws Exception {
+            public ResultSet call() throws SQLException {
                 String stmString = "SELECT ";
                 int fieldCount = fieldsToFetch.size();
                 int i = 1;
@@ -232,28 +160,7 @@ public class DatabaseManager {
             }
         };
 
-        MainCallableTask.ReturnValueCallback<ResultSet> callback = new MainCallableTask.ReturnValueCallback<ResultSet>() {
-            @Override
-            public void complete(ResultSet results) {
-                try {
-                    if (results.next()) {
-                        results.beforeFirst();
-                        handler.succeeded(results);
-                    } else {
-                        handler.noResults();;
-                    }
-                } catch (SQLException e) {
-                    handler.sqlException(e);
-                }
-            }
-
-            @Override
-            public void failed(Exception exception) {
-                handler.handleException(exception);
-            }
-        };
-
-        BackgroundQueue.addToQueue(new MainCallableTask<ResultSet>(query, callback));
+        BackgroundQueue.addToQueue(new SQLQueryTask(query, handler));
     }
 
 
@@ -275,7 +182,7 @@ public class DatabaseManager {
                     }
                     stm.executeUpdate();
                 } catch (SQLException e) {
-                    handler.sqlException(e);
+                    handler.failed(e);
                 }
             }
         };
@@ -292,34 +199,54 @@ public class DatabaseManager {
 
     // All callback completion handlers will be executed on the main thread
     // TODO: make it so that the handlers get called back on the thread the call was made on
-    public static abstract class SQLCompletionHandler {
-        public void handleException(Exception e) {
-            if (e.getClass() == SQLException.class) {
-                sqlException((SQLException) e);
-            } else {
-                threadException(e);
-            }
+    public  interface SQLExceptionHandler {
+        public void failed(SQLException exception);
+    }
+
+    public static abstract class SQLExceptionHandlerWrapper implements SQLExceptionHandler {
+        public final SQLExceptionHandler exceptionHandler;
+
+        public SQLExceptionHandlerWrapper(SQLExceptionHandler exceptionHandler) {
+            this.exceptionHandler = exceptionHandler;
         }
 
-        abstract public void sqlException(SQLException exception);
-
-        public void threadException(Exception exception) {
-            exception.printStackTrace();
-            System.out.println(exception.getLocalizedMessage());
+        @Override
+        public void failed(SQLException exception) {
+            exceptionHandler.failed(exception);
         }
     }
 
-    public static abstract class CreateCompletionHandler extends SQLCompletionHandler {
+    //Create handler
+    public interface CreateCompletionHandler extends SQLExceptionHandler {
         abstract public void succeeded(int ID);
     }
 
-    public static abstract class QueryCompletionHandler extends SQLCompletionHandler {
-        abstract public void succeeded(ResultSet results) throws SQLException;
-        abstract public void noResults();
+    public static abstract class CreateSuccessHandler extends SQLExceptionHandlerWrapper implements CreateCompletionHandler {
+        public CreateSuccessHandler(SQLExceptionHandler exceptionHandler) {
+            super(exceptionHandler);
+        }
     }
 
-    public static abstract class SaveCompletionHandler extends SQLCompletionHandler {
-        abstract public void succeeded();
+    //Query handlers
+    public interface QueryCompletionHandler extends SQLExceptionHandler {
+        abstract public void succeeded(ResultSet results) throws SQLException;
+    }
+
+    public static abstract class QuerySuccessHandler extends SQLExceptionHandlerWrapper implements QueryCompletionHandler {
+        public QuerySuccessHandler(SQLExceptionHandler exceptionHandler) {
+            super(exceptionHandler);
+        }
+    }
+
+    //Saving handlers
+    public interface SaveCompletionHandler extends SQLExceptionHandler {
+        public void succeeded();
+    }
+
+    public static abstract class SaveSuccessHandler extends SQLExceptionHandlerWrapper implements SaveCompletionHandler{
+        public SaveSuccessHandler(SQLExceptionHandler exceptionHandler) {
+            super(exceptionHandler);
+        }
     }
 
 
