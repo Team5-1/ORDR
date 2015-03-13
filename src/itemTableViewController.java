@@ -10,13 +10,13 @@ import java.util.ArrayList;
  * Created by danyalaboobakar on 28/01/15.
  */
 
-public class ItemListView {
+public class itemTableViewController {
 
-    public JPanel Table;
+    public JPanel table;
     private JTable itemsTable;
-    private JScrollPane ScrollPane;
+    private JScrollPane scrollPane;
 
-    public ItemListView() {
+    public itemTableViewController() {
         //Prevent movement of columns
         itemsTable.getTableHeader().setReorderingAllowed(false);
 
@@ -53,10 +53,25 @@ public class ItemListView {
         itemsTable.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                JFrame newItem = new JFrame("new item");
+//                JFrame newItem = null;
+//                if(Table == null)
+//                    newItem = new JFrame();
+//                else {
+//                    //remove the previous JFrame
+//                    Table.setVisible(false);
+//                    newItem.dispose();
+//                    //create a new one
+//                    newItem = new JFrame();
+//
+//                }
+
+                JFrame newItem = new JFrame("Item Description");
                 newItem.setSize(850,500);
                 newItem.setVisible(true);
+
                 itemsTable.setVisible(false);
+                table.setVisible(false);
+
             }
 
         });

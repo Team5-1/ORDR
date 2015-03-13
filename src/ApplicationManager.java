@@ -1,6 +1,4 @@
 import javax.swing.*;
-import java.sql.SQLException;
-import java.util.ArrayList;
 
 /**
  * Created by kylejm on 28/11/14.
@@ -8,11 +6,13 @@ import java.util.ArrayList;
 public class ApplicationManager {
     public static void main(String[] args) {
 
-        JFrame frame = new JFrame("ItemListView");
-        frame.setContentPane(new ItemListView().Table);
+        JFrame frame = new JFrame("Products");
+        frame.setContentPane(new ItemTableViewController().table);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
+
+
 
 //        AddEditProductViewController vc = new AddEditProductViewController();
 //        vc.setSize(300, 200);
