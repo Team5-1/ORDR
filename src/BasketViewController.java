@@ -75,11 +75,6 @@ public class BasketViewController extends JFrame implements ViewController {
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
 
             @Override
-            public void noResults() {
-                System.out.println("NONE");
-            }
-
-            @Override
             public void succeeded(final ArrayList<Item> items) {
 
 
@@ -283,11 +278,6 @@ public class BasketViewController extends JFrame implements ViewController {
 
             @Override
             public void failed(SQLException exception) {
-
-            }
-
-            @Override
-            public void noResults() {
 
             }
         });

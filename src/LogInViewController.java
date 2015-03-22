@@ -29,7 +29,7 @@ public class LogInViewController implements ViewController {
                     }
 
                     @Override
-                    public void sqlException(SQLException exception) {
+                    public void failed(SQLException exception) {
                         ordrLabel.setText("failed");
                         System.out.println(exception.getLocalizedMessage());
                     }

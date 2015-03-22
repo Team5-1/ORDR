@@ -10,7 +10,7 @@ public class ApplicationManager {
 
     private static final LogInViewController logInVC = new LogInViewController();
     private static final CreateAccountViewController createAccVC = new CreateAccountViewController();
-    private static final ItemListView listVC = new ItemListView();
+    private static final ItemTableViewController listVC = new ItemTableViewController();
     private static final BasketViewController basketVC = new BasketViewController();
     private static ViewController currentVC = logInVC;
     private static final JPanel mainView = new JPanel(new BorderLayout());
