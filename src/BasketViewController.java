@@ -32,7 +32,7 @@ public class BasketViewController extends JFrame implements ViewController {
         initComponents();
     }
 
-    @SuppressWarnings("unchecked")
+
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
@@ -48,21 +48,26 @@ public class BasketViewController extends JFrame implements ViewController {
         splitLabel = new javax.swing.JLabel();
         updateOrder = new javax.swing.JButton();
 
-        //ArrayList<ArrayList<String>> items = new ArrayList<ArrayList<String>>();
-        //items.add(WIDTH, null);
-
         final DefaultTableModel model = new DefaultTableModel();
 
         //ALI!!!!!!
         //LOOK HERE!
         //TODO
 
-//        int i = 0;
+        int i = 0;
+
+//        totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
+//        totalValueLabel.setText("£0.00");
+//
+//        model.addColumn("Name");
+//        model.addColumn("Price");
+//        model.addColumn("Quantity");
+//
 //        for (Item.BasketItem bItem : User.getCurrentUser().getBasket().values()) {
 //
 //            Double itemPrice = bItem.getItem().getPrice();
-//            model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'}); // getPrice method
-//            totalValue = totalValue + itemPrice; // replace 4.99 with the item price
+//            model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
+//            totalValue = totalValue + itemPrice;
 //            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
 //            i++;
 //        }
@@ -88,25 +93,18 @@ public class BasketViewController extends JFrame implements ViewController {
 
                 for (int i =0;i<items.size();i++) {
 
-                    model.addRow(new Object[]{items.get(i).getName(),items.get(i).getPrice() , '1'}); // getPrice method
-                    totalValue = totalValue + items.get(i).getPrice(); // replace 4.99 with the item price
+                    model.addRow(new Object[]{items.get(i).getName(), items.get(i).getPrice(), '1'});
+                    totalValue = totalValue + items.get(i).getPrice();
                     totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                 }
 
 
                 removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        //  int r=shoppingCartTable.getRowCount();
                         int in = shoppingCartTable.getSelectedRow();
                         System.out.println(in + "selected row");
-                        //totalValue = totalValue - (items.get(in).getPrice());
-                        //totalValue = totalValue - ((items.get(in).getPrice())*(Integer.parseInt(shoppingCartTable.getValueAt(in, 2).toString()))) ;
-                        //totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                         model.removeRow(in);
                         items.remove(in);
-
-                        //if (totalValue <=0){ totalValue=0.00; }
-                        // totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                         updateOrder.doClick();
 
                     }
@@ -122,26 +120,18 @@ public class BasketViewController extends JFrame implements ViewController {
                             items.remove(i);
                             updateOrder.doClick();
                         }
-
-                        //totalValue = 0.00; // use Item.getPrice() method for Item Object or by itemName
-
-
                     }
                 });
 
 
                 shoppingCartTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
                     public void valueChanged(ListSelectionEvent event) {
-                        // do some actions here, for example
-                        // print first column value from selected row
                         removeSelectedButton.setVisible(true);
-                        //System.out.println(shoppingCartTable.getValueAt(shoppingCartTable.getSelectedRow(), 0).toString());
                     }
                 });
 
                 updateOrder.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-
                         int totalRows = shoppingCartTable.getRowCount();
                         System.out.println(totalRows + "total rows");
 
