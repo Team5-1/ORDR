@@ -420,7 +420,8 @@ public class Item extends SQLObject {
             stm.setObject(3, bItem.getQuantity());
             stm.executeUpdate();
             ResultSet insertedID = DatabaseManager.getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
-            OrderItem ordItem = new OrderItem(insertedID.getInt(0), bItem.getItem(), bItem.getQuantity());
+            insertedID.next();
+            OrderItem ordItem = new OrderItem(insertedID.getInt(1), bItem.getItem(), bItem.getQuantity());
             return ordItem;
         }
 

@@ -64,6 +64,7 @@ public class DatabaseManager {
         QueryCompletionHandler callback = new QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) throws SQLException {
+                results.next();
                 handler.succeeded(results.getInt(1));
             }
 

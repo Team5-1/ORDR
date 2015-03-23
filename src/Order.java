@@ -24,7 +24,7 @@ public class Order extends SQLObject {
     private Order() {}
 
     public static void placeOrderWithUser(final User user, final OrderPlacementCompletionHandler handler) {
-        if (user.getBasket().size() == 0) return;
+        if (user.getBasket().size() == 0) handler.succeeded(null);
 
         SQLQueryTask.SQLQueryCall currentDateQuery = new SQLQueryTask.SQLQueryCall() {
             @Override
@@ -37,6 +37,7 @@ public class Order extends SQLObject {
         DatabaseManager.SQLExceptionHandler exceptionHandler = new DatabaseManager.SQLExceptionHandler() {
             @Override
             public void failed(SQLException exception) {
+                System.out.println(exception.getLocalizedMessage());
                 handler.failed(exception);
             }
         };
@@ -44,6 +45,7 @@ public class Order extends SQLObject {
         DatabaseManager.QuerySuccessHandler callback = new DatabaseManager.QuerySuccessHandler(exceptionHandler) {
             @Override
             public void succeeded(ResultSet results) throws SQLException {
+                results.next();
                 final Date currentDate = results.getDate(1);
                 HashMap<String, Object> newOrderDetails = new HashMap<String, Object>(3);
                 newOrderDetails.put(kUSER_ID_COLUMN_NAME, user.getID());
@@ -64,6 +66,7 @@ public class Order extends SQLObject {
                                         newOrder.orderItems.add(ordItem);
                                     }
                                 } catch (SQLException e) {
+                                    System.out.println(e.getLocalizedMessage());
                                     handler.failed(e);
                                 }
                             }
