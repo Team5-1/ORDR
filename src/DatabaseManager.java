@@ -1,5 +1,6 @@
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 
 /**
@@ -24,6 +25,7 @@ public class DatabaseManager {
         }
     }
 
+    //Inserting
     public static void createRecordInBackground(final HashMap<String, Object> columnsAndValues, final String tableName, final CreateCompletionHandler handler) {
         //Create statement callable
         SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
@@ -62,6 +64,7 @@ public class DatabaseManager {
         QueryCompletionHandler callback = new QueryCompletionHandler() {
             @Override
             public void succeeded(ResultSet results) throws SQLException {
+                results.next();
                 handler.succeeded(results.getInt(1));
             }
 
@@ -74,6 +77,8 @@ public class DatabaseManager {
         BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
     }
 
+
+    //Querying
     public static void fetchAllRecordsForTableInBackground(final String tableName, final QueryCompletionHandler handler) {
         SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
             @Override
@@ -164,7 +169,7 @@ public class DatabaseManager {
     }
 
 
-    public static void updateFieldsForRecord(final String tableName, final String recordIDColumnName, final int recordID, final HashMap<String, Object> columnsAndValues, final SaveCompletionHandler handler) {
+    public static void updateFieldsForRecord(final String tableName, final String recordIDColumnName, final int recordID, final HashMap<String, Object> columnsAndValues, final SaveOrDeleteCompletionHandler handler) {
         Runnable query = new Runnable() {
             @Override
             public void run() {
@@ -195,6 +200,60 @@ public class DatabaseManager {
         };
 
         BackgroundQueue.addToQueue(new MainRunnableTask(query, callback));
+    }
+
+
+    //Deleting
+    public static void deleteSQLObject(final SQLObject object, final SaveOrDeleteCompletionHandler handler) {
+        Runnable delete = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    String stmString = String.format("DELETE FROM %s WHERE %s = ?", object.getSQLTableName(), object.getIDColumnName());
+                    PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
+                    stm.setObject(1, object.getID());
+                    stm.executeUpdate();
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+        };
+
+        Runnable callback = new Runnable() {
+            @Override
+            public void run() {
+                handler.succeeded();
+            }
+        };
+
+        BackgroundQueue.addToQueue(new MainRunnableTask(delete, callback));
+    }
+
+    public static void deleteSQLObjects(final Collection<? extends  SQLObject> objects, final SaveOrDeleteCompletionHandler handler) {
+        Runnable delete = new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    for (SQLObject object : objects)  {
+                        String stmString = String.format("DELETE FROM %s WHERE %s = ?", object.getSQLTableName(), object.getIDColumnName());
+                        PreparedStatement stm = getSharedDbConnection().prepareStatement(stmString);
+                        stm.setObject(1, object.getID());
+                        stm.executeUpdate();
+                    }
+                } catch (SQLException e) {
+                    handler.failed(e);
+                }
+            }
+        };
+
+        Runnable callback = new Runnable() {
+            @Override
+            public void run() {
+                handler.succeeded();
+            }
+        };
+
+        BackgroundQueue.addToQueue(new MainRunnableTask(delete, callback));
     }
 
     // All callback completion handlers will be executed on the main thread
@@ -239,12 +298,12 @@ public class DatabaseManager {
     }
 
     //Saving handlers
-    public interface SaveCompletionHandler extends SQLExceptionHandler {
+    public interface SaveOrDeleteCompletionHandler extends SQLExceptionHandler {
         public void succeeded();
     }
 
-    public static abstract class SaveSuccessHandler extends SQLExceptionHandlerWrapper implements SaveCompletionHandler{
-        public SaveSuccessHandler(SQLExceptionHandler exceptionHandler) {
+    public static abstract class SaveOrDeleteSuccessHandler extends SQLExceptionHandlerWrapper implements SaveOrDeleteCompletionHandler {
+        public SaveOrDeleteSuccessHandler(SQLExceptionHandler exceptionHandler) {
             super(exceptionHandler);
         }
     }

@@ -10,9 +10,17 @@ public abstract class SQLObject {
         //TODO: implement this
     }
 
-    public void save(DatabaseManager.SaveCompletionHandler handler) {
+    public void save(DatabaseManager.SaveOrDeleteCompletionHandler handler) {
         if (hasChanges()) {
             DatabaseManager.updateFieldsForRecord(getSQLTableName(), getIDColumnName(), getID(), changes(), handler);
+        } else {
+            handler.succeeded();
+        }
+    }
+
+    public void delete(DatabaseManager.SaveOrDeleteCompletionHandler handler) {
+        if (getID() > 0) {
+            DatabaseManager.deleteSQLObject(this, handler);
         } else {
             handler.succeeded();
         }
