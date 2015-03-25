@@ -36,6 +36,7 @@ public class ApplicationManager {
             if (displayedViewController != null) mainView.remove(displayedViewController.getView());
             displayedViewController = controller;
             mainView.add(controller.getView(),  BorderLayout.CENTER);
+            controller.viewWillAppear();
             mainView.revalidate();
             mainView.repaint();
         }
