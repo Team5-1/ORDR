@@ -1,6 +1,8 @@
+import javax.swing.*;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -15,9 +17,11 @@ public class Item extends SQLObject {
     private static final String kDESCRIPTION_COLUMN_NAME = "description";
     private static final String kPRICE_COLUMN_NAME = "price";
     private static final String kSTOCK_COLUMN_NAME = "stock_qty";
+    private static final String kIMAGE_COLUMN_NAME = "image";
 
     //Constant DB values
     private int ID;
+    private ImageIcon image; //Private for now
 
     //Fetched DB values
     private String fetchedName;
@@ -91,6 +95,8 @@ public class Item extends SQLObject {
         item.fetchedDescription = results.getString(kDESCRIPTION_COLUMN_NAME);
         item.fetchedPrice = results.getDouble(kPRICE_COLUMN_NAME);
         item.fetchedStockQty = results.getInt(kSTOCK_COLUMN_NAME);
+        Blob imageBlob = results.getBlob(kIMAGE_COLUMN_NAME);
+        item.image = new ImageIcon(imageBlob.getBytes(1, (int) imageBlob.length()));
         return item;
     }
 
@@ -170,6 +176,9 @@ public class Item extends SQLObject {
         return (stockQty != null) ? stockQty : fetchedStockQty;
     }
 
+    public ImageIcon getImage() {
+        return image;
+    }
 
     //Setter methods
     public void setName(String name) { this.name = (name.equals(this.name)) ? null : name; }
