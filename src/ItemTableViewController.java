@@ -12,7 +12,7 @@ import java.util.ArrayList;
  * Created by danyalaboobakar on 28/01/15.
  */
 
-public class ItemTableViewController implements ViewController {
+public class ItemTableViewController extends ViewController {
 
     public JPanel view;
     private JTable table;
@@ -89,6 +89,9 @@ public class ItemTableViewController implements ViewController {
         return view;
     }
 
-
+    @Override
+    public String getButtonLabel() {
+        return "Products";
+    }
 }
 
