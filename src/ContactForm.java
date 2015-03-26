@@ -8,7 +8,7 @@ import java.awt.event.ActionListener;
  */
 
 
-public class ContactForm {
+public class ContactForm extends ViewController {
     private JLabel ordrLbl;
     private JPanel mainPanel;
     private JLabel contactLbl;
@@ -96,5 +96,10 @@ public class ContactForm {
 
     public JPanel getView() {
         return mainPanel;
+    }
+
+    @Override
+    public String getButtonLabel() {
+        return "Contact";
     }
 }

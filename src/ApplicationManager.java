@@ -18,7 +18,7 @@ public class ApplicationManager {
         JFrame window = new JFrame("ORDR");
 
         //Init mainView to contain all view controllers
-        window.setSize(800, 600);
+        window.setSize(700, 600);
         window.add(mainView);
 
         //Init navBar
@@ -26,6 +26,7 @@ public class ApplicationManager {
         addViewControllerToNav(new CreateAccountViewController());
         addViewControllerToNav(new ItemTableViewController());
         addViewControllerToNav(new BasketViewController());
+        addViewControllerToNav(new ContactForm());
         mainView.add(navView, BorderLayout.NORTH);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
