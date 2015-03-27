@@ -137,7 +137,7 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
         final JLabel[] iname = new JLabel[100];
         JLabel[] i£Sign = new JLabel[100];
         final JLabel[] IPrice = new JLabel[100];
-        JLabel[] IQuantity = new JLabel[100];
+        final JLabel[] IQuantity = new JLabel[100];
         final JLabel[] IQuantityNum = new JLabel[100];
 
 
@@ -149,7 +149,8 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
             iNumlabelTitle[i] = new JLabel("Item Number:");
             iImg[i] = new JLabel();//TODO place to put images.
             i£Sign[i] = new JLabel("£");
-            IPrice[i] = new JLabel(String.valueOf(bItem.getItem().getPrice()));//gets and displays price of item
+            double panelcalcer = bItem.getItem().getPrice() * bItem.getQuantity();
+            IPrice[i] = new JLabel(String.valueOf(panelcalcer));//gets and displays price of item
             IQuantity[i] = new JLabel("Quantity:");
             IQuantityNum[i] = new JLabel("null");
             IQuantityNum[i].setText(String.valueOf(bItem.getQuantity()));//gets quantity of item
@@ -197,7 +198,7 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
         };
         StandardD.addChangeListener(Change);
         ExpressD.addChangeListener(Change);
-        StandardD.doClick(); // Makes StandardD already selected so the calculation can happen immediatelyy.
+        StandardD.doClick(); // Makes StandardD already selected so the calculation can happen immediately.
 
         ActionListener BuyNow = new ActionListener() {
             @Override
