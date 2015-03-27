@@ -3,12 +3,14 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumn;
 import java.util.ArrayList;
-//import static java.awt.Color.white;
+import static java.awt.Color.black;
+import static java.awt.Color.white;
 
 
 /**
@@ -35,10 +37,10 @@ public class ItemTableViewController extends ViewController {
         final ItemTableViewController selfPointer = this;
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
             @Override
-            public void succeeded(ArrayList <Item> items) {
+            public void succeeded(ArrayList<Item> items) {
                 selfPointer.items = items;
                 for (Item item : items) {
-                    model.addRow(new Object[] {
+                    model.addRow(new Object[]{
                             item.getImage(),
                             item.getName(),
                             item.getDescription(),
@@ -68,13 +70,13 @@ public class ItemTableViewController extends ViewController {
         table.setAutoCreateRowSorter(true);
         table.getTableHeader().setReorderingAllowed(false);
         table.getColumn("Image").setMinWidth(150);
-//        table.setSelectionBackground(white);
         scrollPane.setViewportView(table);
-
         table.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+                table.setSelectionForeground(black);
+                table.setSelectionBackground(white);
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow > -1) {
                     ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
