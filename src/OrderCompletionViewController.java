@@ -32,7 +32,6 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
 
 
     public void initialiseGUI() {
-        if (User.getCurrentUser() != null) { //Checks if user is logged into the system.
             enterDetails();//prompts user to enter delivery details.
 
 
@@ -236,16 +235,6 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
             };
 
             OrderFinish.addActionListener(BuyNow);
-        } else {
-            JOptionPane.showMessageDialog(getView(), "Please login before trying to checkout.");
-            BasketViewController basketVC = new BasketViewController();
-            ApplicationManager.setDisplayedViewController(basketVC);
-            //TODO set a display.
-            //TODO I've added a sout  ApplicationManager.setDisplayedViewController, for some reason after i've set the view and passed basketVC, OrderCompletionViewController is passed.
-            //TODO So i am not sure how to handle it,we could try to do a button click from here or just let the user click the button themselves.
-            //TODO the only problem being with the later is that the current view disappears.
-
-        }
 
 
     }
