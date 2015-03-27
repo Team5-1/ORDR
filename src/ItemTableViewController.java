@@ -21,17 +21,6 @@ public class ItemTableViewController extends ViewController {
     private ArrayList<Item> items;
 
     public ItemTableViewController() {
-        //Prevent movement of columns
-        table.getTableHeader().setReorderingAllowed(false);
-
-        //Prevent cells from being edited
-//        table.setEnabled(true);
-        table.setRowSelectionAllowed(true);
-//        table.setCellSelectionEnabled(true);
-//        table.setColumnSelectionAllowed(true);
-
-        //Ability to sort each item according to column.
-        table.setAutoCreateRowSorter(true);
 
         model = new DefaultTableModel();
         model.addColumn("Image");
@@ -46,14 +35,16 @@ public class ItemTableViewController extends ViewController {
             public void succeeded(ArrayList <Item> items) {
                 selfPointer.items = items;
                 for (Item item : items) {
-                    model.addRow(new Object[] {item.getName(), item.getDescription(),item.getPrice(), item.getStockQty()});
-
+                    model.addRow(new Object[] {
+                            item.getImage(),
+                            item.getName(),
+                            item.getDescription(),
+                            item.getPrice(),
+                            item.getStockQty()
+                    });
                 }
 
                 //Setting the height of table rows.
-                table.setRowHeight(30);
-                table.setModel(model);
-
             }
 
             @Override
@@ -61,6 +52,19 @@ public class ItemTableViewController extends ViewController {
 
             }
         });
+
+        table = new JTable(model) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                 return (column == 0) ? Icon.class : Object.class;
+            }
+        };
+        table.setRowHeight(30);
+        table.setRowSelectionAllowed(true);
+        table.setAutoCreateRowSorter(true);
+        table.getTableHeader().setReorderingAllowed(false);
+
+        scrollPane.setViewportView(table);
 
         table.addMouseListener(new MouseAdapter() {
 

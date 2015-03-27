@@ -27,27 +27,7 @@
           <horizontalScrollBarPolicy value="30"/>
         </properties>
         <border type="etched"/>
-        <children>
-          <component id="46b8f" class="javax.swing.JTable" binding="table">
-            <constraints/>
-            <properties>
-              <autoResizeMode value="4"/>
-              <enabled value="true"/>
-              <intercellSpacing width="1" height="1"/>
-              <preferredScrollableViewportSize width="-1" height="300"/>
-              <preferredSize width="-1" height="500"/>
-              <showHorizontalLines value="false"/>
-              <showVerticalLines value="false"/>
-              <surrendersFocusOnKeystroke value="false"/>
-              <verifyInputWhenFocusTarget value="true"/>
-              <visible value="true"/>
-            </properties>
-            <clientProperties>
-              <JTable.autoStartsEdit class="java.lang.Boolean" value="false"/>
-              <Table.isFileList class="java.lang.Boolean" value="false"/>
-            </clientProperties>
-          </component>
-        </children>
+        <children/>
       </scrollpane>
       <component id="fb532" class="javax.swing.JLabel">
         <constraints>
