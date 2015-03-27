@@ -2,8 +2,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 /**
  * Created by MaywandA on 19/02/15.
@@ -11,14 +9,15 @@ import java.awt.event.MouseEvent;
 public class ItemDetailViewController extends ViewController {
     private JLabel itemName;
     private JLabel price;
-    private JTextArea itemDescription;
+    private JTextArea itemDescription ;
     private JComboBox quantityCmb;
     private JPanel panel;
     private JLabel priceTotalLabel;
-    private JButton addToBasketButton;
+    private JButton BasketButton;
     private JPanel BottomPanel;
     private JLabel logoLabel;
     final private Item item;
+
 
     public ItemDetailViewController(Item item) {
         this.item = item;
@@ -36,30 +35,20 @@ public class ItemDetailViewController extends ViewController {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 String quantity = e.getItem().toString();
-                if (!quantity.equalsIgnoreCase("")) {
+                if (!quantity.equalsIgnoreCase("Quantity Needed:")) {
                     priceTotalLabel.setText("£" + (Integer.parseInt(quantity) * item.getPrice()));
                 }
 
-            }
-        });
-        addToBasketButton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                String selectedItem = quantityCmb.getSelectedItem().toString();
-                if (User.getCurrentUser() != null && !selectedItem.equalsIgnoreCase("Quantity Needed:")) {
-                    User.getCurrentUser().addToBasket(item, Integer.parseInt(selectedItem));
-                }
             }
         });
     }
 
     public void populateField() {
         itemName.setText(item.getName());
-        itemDescription.setText(item.getDescription());
         price.setText("£ " + item.getPrice());
+        itemDescription.setText(item.getDescription());
         itemDescription.setEditable(false);
         itemDescription.setLineWrap(true);
-        itemDescription.setWrapStyleWord(true);
     }
 
 
