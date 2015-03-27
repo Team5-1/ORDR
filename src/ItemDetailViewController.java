@@ -9,7 +9,7 @@ import java.awt.event.ItemListener;
 public class ItemDetailViewController extends ViewController {
     private JLabel itemName;
     private JLabel price;
-    private JLabel itemDescription;
+    private JTextArea itemDescription ;
     private JComboBox quantityCmb;
     private JPanel panel;
     private JLabel priceTotalLabel;
@@ -17,6 +17,7 @@ public class ItemDetailViewController extends ViewController {
     private JPanel BottomPanel;
     private JLabel logoLabel;
     final private Item item;
+
 
     public ItemDetailViewController(Item item) {
         this.item = item;
@@ -44,8 +45,10 @@ public class ItemDetailViewController extends ViewController {
 
     public void populateField() {
         itemName.setText(item.getName());
-        itemDescription.setText(item.getDescription());
         price.setText("£ " + item.getPrice());
+        itemDescription.setText(item.getDescription());
+        itemDescription.setEditable(false);
+        itemDescription.setLineWrap(true);
     }
 
 
