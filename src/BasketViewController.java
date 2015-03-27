@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Created by aliyounas on 26/01/15.
  */
-public class BasketViewController extends JFrame implements ViewController {
+public class BasketViewController extends ViewController {
 
     private JButton checkOutButton;
     private JButton clearCartButton;
@@ -60,7 +60,7 @@ public class BasketViewController extends JFrame implements ViewController {
 
 
         if (User.getCurrentUser() == null) {
-            //storeLabel.setText("NOT LOGGED IN");
+            storeLabel.setText("NOT LOGGED IN");
 
         } else {
             final HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
@@ -84,23 +84,23 @@ public class BasketViewController extends JFrame implements ViewController {
 
                 removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        int in = shoppingCartTable.getSelectedRow();
-                        System.out.println(in + "selected row");
-                        model.removeRow(in);
-                        items.remove(in);
-                        updateOrder.doClick();
+//                        int in = shoppingCartTable.getSelectedRow();
+//                        System.out.println(in + "selected row");
+//                        model.removeRow(in);
+//                        items.remove(in);
+//                        updateOrder.doClick();
                     }
                 });
 
                 clearCartButton.addActionListener(new java.awt.event.ActionListener() {
                     public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        int totalRows = shoppingCartTable.getRowCount();
-                        for (int i = 0; totalRows > i; i++) {
-
-                            model.removeRow(0);
-                            items.remove(i);
-                            updateOrder.doClick();
-                        }
+//                        int totalRows = shoppingCartTable.getRowCount();
+//                        for (int i = 0; totalRows > i; i++) {
+//
+//                            model.removeRow(0);
+//                            items.remove(i);
+//                            updateOrder.doClick();
+//                        }
                     }
                 });
 
@@ -323,6 +323,11 @@ public class BasketViewController extends JFrame implements ViewController {
     @Override
     public Component getView() {
         return getContentPane();
+    }
+
+    @Override
+    public String getButtonLabel() {
+        return "Basket";
     }
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
