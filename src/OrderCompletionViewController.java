@@ -13,7 +13,7 @@ import static java.lang.System.*;
 /**
  * Created by James on 13/02/2015.
  */
-public class OrderCompletionViewController extends javax.swing.JFrame implements ViewController {
+public class OrderCompletionViewController extends ViewController {
 
     public OrderCompletionViewController(HashMap<Integer, Item.BasketItem> basket) throws HeadlessException {
         //TODO: Either get rid of Headless exception of handle it
