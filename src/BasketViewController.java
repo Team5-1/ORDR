@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Created by aliyounas on 26/01/15.
  */
-public class BasketViewController extends ViewController {
+public class BasketViewController extends JFrame implements ViewController {
 
     private JButton checkOutButton;
     private JButton clearCartButton;
@@ -42,13 +42,12 @@ public class BasketViewController extends ViewController {
         totalValueLabel = new javax.swing.JLabel();
         checkOutButton = new javax.swing.JButton();
         removeSelectedButton = new javax.swing.JButton();
-        removeSelectedButton.setVisible(false);
         storeLabel = new javax.swing.JLabel();
         clearCartButton = new javax.swing.JButton();
         splitLabel = new javax.swing.JLabel();
         updateOrder = new javax.swing.JButton();
 
-        final DefaultTableModel model = new DefaultTableModel();
+
 
         //ALI!!!!!!
         //LOOK HERE!
@@ -59,19 +58,85 @@ public class BasketViewController extends ViewController {
         totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
         totalValueLabel.setText("£0.00");
 
-        model.addColumn("Name");
-        model.addColumn("Price");
-        model.addColumn("Quantity");
 
-        for (Item.BasketItem bItem : User.getCurrentUser().getBasket().values()) {
+        if (User.getCurrentUser() == null) {
+            //storeLabel.setText("NOT LOGGED IN");
 
-            Double itemPrice = bItem.getItem().getPrice();
-            model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
-            totalValue = totalValue + itemPrice;
-            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
-            i++;
+        } else {
+            final HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
+            if (basket != null && basket.size() > 0) {
+
+                final DefaultTableModel model = new DefaultTableModel();
+
+                model.addColumn("Name");
+                model.addColumn("Price");
+                model.addColumn("Quantity");
+                for (Item.BasketItem bItem : basket.values()) {
+
+                    Double itemPrice = bItem.getItem().getPrice();
+                    model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
+                    totalValue = totalValue + itemPrice;
+                    totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                    i++;
+                }
+
+                shoppingCartTable.setModel(model);
+
+                removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        int in = shoppingCartTable.getSelectedRow();
+                        System.out.println(in + "selected row");
+                        model.removeRow(in);
+                        items.remove(in);
+                        updateOrder.doClick();
+                    }
+                });
+
+                clearCartButton.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        int totalRows = shoppingCartTable.getRowCount();
+                        for (int i = 0; totalRows > i; i++) {
+
+                            model.removeRow(0);
+                            items.remove(i);
+                            updateOrder.doClick();
+                        }
+                    }
+                });
+
+
+                updateOrder.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        int totalRows = shoppingCartTable.getRowCount();
+                        System.out.println(totalRows + "total rows");
+
+                        double totalValue = 0.0;
+
+                        //
+                        for (Item.BasketItem bItem : basket.values()) {
+                            for (int i = 0; i < totalRows; i++) {
+                                //totalValue = totalValue + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * bItem.getItem(i).getPrice();
+                        }
+                        totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+
+                        }
+                    }
+                });
+
+                checkOutButton.addActionListener(new java.awt.event.ActionListener() {
+                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+                        checkOutButtonActionPerformed(evt);
+                    }
+                });
+
+                storeLabel.setText("ORDR Basket");
+            } else {
+                storeLabel.setText("Empty Basket");
+            }
+
         }
 //
+
 //        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
 //
 //            @Override
@@ -155,7 +220,7 @@ public class BasketViewController extends ViewController {
 //            }
 //        });
 
-        shoppingCartTable.setModel(model);
+        //shoppingCartTable.setModel(model);
 
         jScrollPane1.setViewportView(shoppingCartTable);
 
@@ -171,7 +236,6 @@ public class BasketViewController extends ViewController {
         removeSelectedButton.setText("Remove Selected Item");
 
         storeLabel.setFont(new java.awt.Font("Lucida Grande", 0, 30));
-        storeLabel.setText("ORDR Basket");
 
         clearCartButton.setText("Clear Cart");
 
@@ -256,6 +320,11 @@ public class BasketViewController extends ViewController {
         pack();
     }
 
+    @Override
+    public Component getView() {
+        return getContentPane();
+    }
+
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
             @Override
@@ -276,14 +345,10 @@ public class BasketViewController extends ViewController {
         });
     }
 
-    //Getters
-    @Override
-    public Component getView() {
-        return getContentPane();
-    }
+    /**
+     * @param args the command line arguments
+     */
 
-    @Override
-    public String getButtonLabel() { return "Basket"; }
 }
 
 
