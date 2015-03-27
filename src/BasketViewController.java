@@ -339,8 +339,12 @@ public class BasketViewController extends ViewController {
                     Item.BasketItem bItem = Item.BasketItem.makeBasketItem(30, item, 3);
                     basket.put(item.getID(), bItem);
                 }
-                OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
-                ApplicationManager.setDisplayedViewController(orderVC);
+                 if (User.getCurrentUser() != null) {
+                    OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
+                    ApplicationManager.setDisplayedViewController(orderVC);
+                }else {
+                    JOptionPane.showMessageDialog(getView(), "Please login before trying to checkout.");
+                }
             }
 
             @Override
