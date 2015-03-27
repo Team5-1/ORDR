@@ -1,5 +1,8 @@
+import javax.swing.*;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Blob;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -14,9 +17,11 @@ public class Item extends SQLObject {
     private static final String kDESCRIPTION_COLUMN_NAME = "description";
     private static final String kPRICE_COLUMN_NAME = "price";
     private static final String kSTOCK_COLUMN_NAME = "stock_qty";
+    private static final String kIMAGE_COLUMN_NAME = "image";
 
     //Constant DB values
     private int ID;
+    private ImageIcon image; //Private for now
 
     //Fetched DB values
     private String fetchedName;
@@ -90,14 +95,16 @@ public class Item extends SQLObject {
         item.fetchedDescription = results.getString(kDESCRIPTION_COLUMN_NAME);
         item.fetchedPrice = results.getDouble(kPRICE_COLUMN_NAME);
         item.fetchedStockQty = results.getInt(kSTOCK_COLUMN_NAME);
+        Blob imageBlob = results.getBlob(kIMAGE_COLUMN_NAME);
+        item.image = new ImageIcon(imageBlob.getBytes(1, (int) imageBlob.length()));
         return item;
     }
 
     //SQLObject methods
     //TODO: change this save method to be in the SQLObject only and make a updateFields private abstract method that will be called by SQLObject on save completion
     @Override
-    public void save(final DatabaseManager.SaveCompletionHandler handler) {
-        super.save(new DatabaseManager.SaveCompletionHandler() {
+    public void save(final DatabaseManager.SaveOrDeleteCompletionHandler handler) {
+        super.save(new DatabaseManager.SaveOrDeleteCompletionHandler() {
             @Override
             public void succeeded() {
                 if (name != null) {
@@ -169,6 +176,9 @@ public class Item extends SQLObject {
         return (stockQty != null) ? stockQty : fetchedStockQty;
     }
 
+    public ImageIcon getImage() {
+        return image;
+    }
 
     //Setter methods
     public void setName(String name) { this.name = (name.equals(this.name)) ? null : name; }
@@ -254,13 +264,6 @@ public class Item extends SQLObject {
             BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
         }
 
-        DatabaseManager.SQLExceptionHandler sqlExceptionHandler = new DatabaseManager.SQLExceptionHandler() {
-            @Override
-            public void failed(SQLException exception) {
-
-            }
-        };
-
         public static BasketItem makeBasketItem(final int userID, final Item item, final int quantity) {
             //TODO: Handle duplicate here
             if (userID == 0 || item == null || item.getID() == 0 || quantity == 0) return null;
@@ -296,7 +299,7 @@ public class Item extends SQLObject {
                             public void succeeded(ResultSet results) throws SQLException {
                                 results.next();
                                 bItem.ID = results.getInt(kID_COLUMN_NAME);
-                                bItem.save(new DatabaseManager.SaveSuccessHandler(saveFailure) {
+                                bItem.save(new DatabaseManager.SaveOrDeleteSuccessHandler(saveFailure) {
                                     @Override
                                     public void succeeded() {
                                         bItem.fetchedQuantity = bItem.quantity;
@@ -351,6 +354,114 @@ public class Item extends SQLObject {
 
         public interface MultipleBasketItemCompletionHandler extends DatabaseManager.SQLExceptionHandler {
             abstract public void succeeded(HashMap<Integer, BasketItem> basketItems);
+        }
+    }
+
+    public static class OrderItem extends SQLObject {
+        //DB column names
+        private static final String kID_COLUMN_NAME = "order_item_id";
+        private static final String kORDER_ID_COLUMN_NAME = "order_id";
+        private static final String kITEM_ID_COLUMN_NAME = "item_id";
+        private static final String kQUANTITY_COLUMN_NAME = "quantity";
+
+        //Constant DB values
+        private int ID;
+        private Item item;
+        private int quantity;
+
+        private OrderItem() {}
+
+        private OrderItem(int ID, Item item, int quantity) {
+            this.ID = ID;
+            this.item = item;
+            this.quantity = quantity;
+        }
+
+        public static void fetchOrderItemsForOrder(final Order order, final MultipleOrderItemCompletionHandler handler) {
+
+            SQLQueryTask.SQLQueryCall query = new SQLQueryTask.SQLQueryCall() {
+                @Override
+                public ResultSet call() throws SQLException {
+                    String orderItemTableName = getSQLTableName(Order.class);
+                    String itemTableName = getSQLTableName(Item.class);
+                    String select = "SELECT * FROM " + orderItemTableName;
+                    String join = String.format(" LEFT JOIN %s ON %s.%s = %s.%s ", itemTableName, itemTableName, kITEM_ID_COLUMN_NAME, orderItemTableName, kITEM_ID_COLUMN_NAME);
+                    String where = String.format("WHERE %s.%s = %d", orderItemTableName, kORDER_ID_COLUMN_NAME, order.getID());
+                    String stmString = select + join + where;
+                    return DatabaseManager.getSharedDbConnection().prepareStatement(stmString).executeQuery();
+                }
+            };
+
+            DatabaseManager.QueryCompletionHandler callback = new DatabaseManager.QueryCompletionHandler() {
+                @Override
+                public void succeeded(ResultSet results) throws SQLException {
+                    ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
+                    while (results.next()) {
+                        OrderItem ordItem = new OrderItem();
+                        ordItem.ID = results.getInt(kID_COLUMN_NAME);
+                        ordItem.quantity = results.getInt(kQUANTITY_COLUMN_NAME);
+                        ordItem.item = itemFromResultSet(results);
+                        orderItems.add(ordItem);
+
+                    }
+                    handler.succeeded(orderItems);
+                }
+
+                @Override
+                public void failed(SQLException exception) {
+                    handler.failed(exception);
+                }
+            };
+
+            BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
+        }
+
+        public static OrderItem makeOrderItemFromBasketItem(final BasketItem bItem, final Order order) throws SQLException {
+            //TODO: Handle duplicate here
+            //Don't need to handle null Order ID checks etc as an Order instance can't successfully be instantiated without one
+
+            String insert = String.format("INSERT INTO %s ", getSQLTableName(OrderItem.class));
+            String columns = String.format("(%s, %s, %s) ", kORDER_ID_COLUMN_NAME, kITEM_ID_COLUMN_NAME, kQUANTITY_COLUMN_NAME);
+            String values = String.format("VALUES (?, ?, ?)");
+            PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(insert + columns + values);
+            stm.setObject(1, order.getID());
+            stm.setObject(2, bItem.item.getID());
+            stm.setObject(3, bItem.getQuantity());
+            stm.executeUpdate();
+            ResultSet insertedID = DatabaseManager.getSharedDbConnection().prepareStatement("SELECT LAST_INSERT_ID()").executeQuery();
+            insertedID.next();
+            OrderItem ordItem = new OrderItem(insertedID.getInt(1), bItem.getItem(), bItem.getQuantity());
+            return ordItem;
+        }
+
+        //SQLObject methods
+        @Override
+        public Boolean hasChanges() {
+            return false;
+        }
+
+        @Override
+        public HashMap<String, Object> changes() { return null; }
+
+        @Override
+        public String getIDColumnName() {
+            return kID_COLUMN_NAME;
+        }
+
+        @Override
+        public int getID() {
+            return ID;
+        }
+
+        //Getters
+        public Item getItem() { return item; }
+
+        public int getQuantity() {
+            return quantity;
+        }
+
+        public interface MultipleOrderItemCompletionHandler extends DatabaseManager.SQLExceptionHandler {
+            abstract public void succeeded(ArrayList<OrderItem> orderItems);
         }
     }
 
