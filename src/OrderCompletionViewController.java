@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -19,7 +20,7 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
         this.basket = basket; //Gets user HasMap basket
         initialiseGUI(); // Starts the gui
     }
-
+    private static final LogInViewController logInVC = new LogInViewController();
     public double orderTotal, itemTotal, itemCalc, postingTotal; //Used to calculate the total
     String paymentMethod, roadName, roadNumber, town, postCode, phoneNumber; // Used to store user delivery details
     private HashMap<Integer, Item.BasketItem> basket; //contains the item details passed from basket
@@ -32,209 +33,208 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
 
 
     public void initialiseGUI() {
-            enterDetails();//prompts user to enter delivery details.
+        enterDetails();//prompts user to enter delivery details.
 
 
-            Container container = getContentPane(); //Creates contentPane container which I use to display my JPanels
-            container.setLayout(new GridBagLayout()); //Sets Layout of my ContentPane to GridBagLayout.
-            GridBagConstraints cns = new GridBagConstraints(); //Create GridBagConstraints which allows me to manipulate the layout.
+        Container container = getContentPane(); //Creates contentPane container which I use to display my JPanels
+        container.setLayout(new GridBagLayout()); //Sets Layout of my ContentPane to GridBagLayout.
+        GridBagConstraints cns = new GridBagConstraints(); //Create GridBagConstraints which allows me to manipulate the layout.
 
-            JPanel detailsPane = new JPanel(); //Creates one of 3 my JPanels I add to my ContentPane container.
-            detailsPane.setLayout(new MigLayout());//Sets my JPanel a Free and Open Source Layout Manager available at http://www.miglayout.com/
-            cns.gridx = 0; //GridBagConstraints start.
-            cns.gridy = 0;
-            cns.gridwidth = 1;
-            cns.weightx = 0.9;
-            cns.weighty = 0.3;
-            cns.anchor = GridBagConstraints.FIRST_LINE_START;
-            cns.fill = GridBagConstraints.BOTH; //GridBagConstraints end this set of Constraints ensure that the detailsPane is displayed at the top Left.
-            detailsPane.setBackground(Color.WHITE);//Sets the detailsPane JPanel background to white.
-            container.add(detailsPane, cns); //Adds detailsPane to containers using the GridBagConstraints.
+        JPanel detailsPane = new JPanel(); //Creates one of 3 my JPanels I add to my ContentPane container.
+        detailsPane.setLayout(new MigLayout());//Sets my JPanel a Free and Open Source Layout Manager available at http://www.miglayout.com/
+        cns.gridx = 0; //GridBagConstraints start.
+        cns.gridy = 0;
+        cns.gridwidth = 1;
+        cns.weightx = 0.9;
+        cns.weighty = 0.3;
+        cns.anchor = GridBagConstraints.FIRST_LINE_START;
+        cns.fill = GridBagConstraints.BOTH; //GridBagConstraints end this set of Constraints ensure that the detailsPane is displayed at the top Left.
+        detailsPane.setBackground(Color.WHITE);//Sets the detailsPane JPanel background to white.
+        container.add(detailsPane, cns); //Adds detailsPane to containers using the GridBagConstraints.
 
-            JPanel totalPane = new JPanel(); //Creates one of my 3 JPanels I add to my ContentPane container.
-            totalPane.setLayout(new MigLayout());//Sets my JPanel a Free and Open Source Layout Manager available at http://www.miglayout.com/
-            cns.gridx = 1;//GridBagConstraints start.
-            cns.gridy = 0;
-            cns.weighty = 0.1;
-            cns.weightx = 0.3;
-            cns.anchor = GridBagConstraints.FIRST_LINE_END;
-            cns.fill = GridBagConstraints.BOTH;//GridBagConstraints end this set of Constraints ensure that the TotalPane is displayed at the top Right.
-            container.add(totalPane, cns);//Adds TotalPane to containers using the GridBagConstraints.
+        JPanel totalPane = new JPanel(); //Creates one of my 3 JPanels I add to my ContentPane container.
+        totalPane.setLayout(new MigLayout());//Sets my JPanel a Free and Open Source Layout Manager available at http://www.miglayout.com/
+        cns.gridx = 1;//GridBagConstraints start.
+        cns.gridy = 0;
+        cns.weighty = 0.1;
+        cns.weightx = 0.3;
+        cns.anchor = GridBagConstraints.FIRST_LINE_END;
+        cns.fill = GridBagConstraints.BOTH;//GridBagConstraints end this set of Constraints ensure that the TotalPane is displayed at the top Right.
+        container.add(totalPane, cns);//Adds TotalPane to containers using the GridBagConstraints.
 
-            JPanel itemPane = new JPanel(); //Creates Last of my 3 JPanels I add to my ContentPane container.
-            JScrollPane scroll = new JScrollPane(itemPane);//I create JScrollPane and add itemPane this allows my JPanel to become scrollable unlike my other two Panels.
-            itemPane.setLayout(new BoxLayout(itemPane, BoxLayout.Y_AXIS)); // As Opposed to using MIG Layout I use BoxLayout because of the it handles new content being added to the Layout.
-            itemPane.setBackground(Color.cyan);
-            cns.gridx = 0;//GridBagConstraints start.
-            cns.gridy = 1;
-            cns.gridwidth = 2;
-            cns.weightx = 1.0;
-            cns.weighty = 0.7;
-            cns.anchor = GridBagConstraints.LAST_LINE_START;
-            cns.fill = GridBagConstraints.BOTH;//GridBagConstraints end this set of Constraints ensure that the Scroll is displayed beneath my other two JPanel.
-            container.add(scroll, cns);//Adds scroll to container.
+        JPanel itemPane = new JPanel(); //Creates Last of my 3 JPanels I add to my ContentPane container.
+        JScrollPane scroll = new JScrollPane(itemPane);//I create JScrollPane and add itemPane this allows my JPanel to become scrollable unlike my other two Panels.
+        itemPane.setLayout(new BoxLayout(itemPane, BoxLayout.Y_AXIS)); // As Opposed to using MIG Layout I use BoxLayout because of the it handles new content being added to the Layout.
+        itemPane.setBackground(Color.cyan);
+        cns.gridx = 0;//GridBagConstraints start.
+        cns.gridy = 1;
+        cns.gridwidth = 2;
+        cns.weightx = 1.0;
+        cns.weighty = 0.7;
+        cns.anchor = GridBagConstraints.LAST_LINE_START;
+        cns.fill = GridBagConstraints.BOTH;//GridBagConstraints end this set of Constraints ensure that the Scroll is displayed beneath my other two JPanel.
+        container.add(scroll, cns);//Adds scroll to container.
 
-            JLabel userForename = new JLabel(User.getCurrentUser().getFirstName());//Creates a JLabel and sets it to the value of the currently logged in user.
-            detailsPane.add(userForename, "split 2"); // adds userForename detailsPane, MigLayout unlike box layouts handles adding content via cells 'split 2' is making the next added content share the cell
-            JLabel userSurname = new JLabel(User.getCurrentUser().getLastName());//Creates JLabel and sets it to the value of the users Surname.
-            detailsPane.add(userSurname);// Adds  userSurname to previously userForename Cell.
-            JLabel paymentMethodTitle = new JLabel("Payment Method:");//paymentMethodTitle Label
-            detailsPane.add(paymentMethodTitle, "gapleft 100, wrap 15");// Adds the Label to the Details pane, gapleft 100 moves the label, wrap moves cell down.
-            JLabel deliveryAddress = new JLabel("Delivery Address");//Creates new label and sets its contents
-            detailsPane.add(deliveryAddress);// adds label to pane
-            JLabel billing = new JLabel(paymentMethod);//Similar to before.
-            detailsPane.add(billing, "gapleft 100, wrap");
-            JLabel deliveryRoad = new JLabel(roadName);
-            detailsPane.add(deliveryRoad, "split 2");
-            JLabel deliveryRoadNum = new JLabel(roadNumber);
-            detailsPane.add(deliveryRoadNum, "wrap");
-            JLabel deliveryTown = new JLabel(town);
-            detailsPane.add(deliveryTown, "split 2");
-            JLabel deliveryPostCode = new JLabel(postCode);
-            detailsPane.add(deliveryPostCode, "wrap");
-            JLabel phoneTitle = new JLabel("Phone:");
-            detailsPane.add(phoneTitle, "split 2");
-            JLabel Phone = new JLabel(phoneNumber);
-            detailsPane.add(Phone);//completes detailsPane
+        JLabel userForename = new JLabel(User.getCurrentUser().getFirstName());//Creates a JLabel and sets it to the value of the currently logged in user.
+        detailsPane.add(userForename, "split 2"); // adds userForename detailsPane, MigLayout unlike box layouts handles adding content via cells 'split 2' is making the next added content share the cell
+        JLabel userSurname = new JLabel(User.getCurrentUser().getLastName());//Creates JLabel and sets it to the value of the users Surname.
+        detailsPane.add(userSurname);// Adds  userSurname to previously userForename Cell.
+        JLabel paymentMethodTitle = new JLabel("Payment Method:");//paymentMethodTitle Label
+        detailsPane.add(paymentMethodTitle, "gapleft 100, wrap 15");// Adds the Label to the Details pane, gapleft 100 moves the label, wrap moves cell down.
+        JLabel deliveryAddress = new JLabel("Delivery Address");//Creates new label and sets its contents
+        detailsPane.add(deliveryAddress);// adds label to pane
+        JLabel billing = new JLabel(paymentMethod);//Similar to before.
+        detailsPane.add(billing, "gapleft 100, wrap");
+        JLabel deliveryRoad = new JLabel(roadName);
+        detailsPane.add(deliveryRoad, "split 2");
+        JLabel deliveryRoadNum = new JLabel(roadNumber);
+        detailsPane.add(deliveryRoadNum, "wrap");
+        JLabel deliveryTown = new JLabel(town);
+        detailsPane.add(deliveryTown, "split 2");
+        JLabel deliveryPostCode = new JLabel(postCode);
+        detailsPane.add(deliveryPostCode, "wrap");
+        JLabel phoneTitle = new JLabel("Phone:");
+        detailsPane.add(phoneTitle, "split 2");
+        JLabel Phone = new JLabel(phoneNumber);
+        detailsPane.add(Phone);//completes detailsPane
 
-            final JButton OrderFinish = new JButton("Buy Now");
-            totalPane.add(OrderFinish, "cell 1 0 ,wrap");// Mig layout also lets you state specific cell coordinates to put things into.
-            JLabel ItemTitle = new JLabel("Items:");
-            totalPane.add(ItemTitle, "cell 1 1");
-            JLabel Item££sign = new JLabel("£");
-            totalPane.add(Item££sign, "split 2");
-            final JLabel ItemTotal = new JLabel("null");
-            totalPane.add(ItemTotal, "cell 2 1");
-            JLabel PackagingTitle = new JLabel("Postage & Packing:");
-            totalPane.add(PackagingTitle, "Cell 1 2");
-            JLabel Packing£sign = new JLabel("£");
-            totalPane.add(Packing£sign, "split 2");
-            final JLabel PackagingTotal = new JLabel("00.00");
-            totalPane.add(PackagingTotal, "cell 2 2, wrap 15");
-            JSeparator TotalSeparator = new JSeparator(SwingConstants.HORIZONTAL);//Separator for different values.
-            TotalSeparator.setBackground(Color.CYAN);
-            totalPane.add(TotalSeparator, "cell 0 4,pushx, growx, span,wrap");//push x and grow x and span lets the separator take up more than one cell.
-            JLabel OrderTotalTitle = new JLabel("Order Total:");
-            totalPane.add(OrderTotalTitle, "cell 1 5");
-            JLabel Order£sign = new JLabel("£");
-            totalPane.add(Order£sign, "split 2");
-            final JLabel OrderTotal = new JLabel("null");
-            totalPane.add(OrderTotal, "wrap");
-            final JRadioButton StandardD = new JRadioButton("Standard Delivery");
-            totalPane.add(StandardD, "cell 1 6, wrap");
-            final JRadioButton ExpressD = new JRadioButton("Express Delivery");
-            totalPane.add(ExpressD, "cell 1 7");
-            ButtonGroup Delivery = new ButtonGroup();
-            Delivery.add(StandardD);
-            Delivery.add(ExpressD);
-
-
-            final JPanel[] Ipanel = new JPanel[100];//This creates an array of Java swing components
-            JLabel[] iNumLabel = new JLabel[100];
-            JLabel[] iNumlabelTitle = new JLabel[100];
-            JLabel[] iImg = new JLabel[100];
-            final JLabel[] iname = new JLabel[100];
-            JLabel[] i£Sign = new JLabel[100];
-            final JLabel[] IPrice = new JLabel[100];
-            JLabel[] IQuantity = new JLabel[100];
-            final JLabel[] IQuantityNum = new JLabel[100];
+        final JButton OrderFinish = new JButton("Buy Now");
+        totalPane.add(OrderFinish, "cell 1 0 ,wrap");// Mig layout also lets you state specific cell coordinates to put things into.
+        JLabel ItemTitle = new JLabel("Items:");
+        totalPane.add(ItemTitle, "cell 1 1");
+        JLabel Item££sign = new JLabel("£");
+        totalPane.add(Item££sign, "split 2");
+        final JLabel ItemTotal = new JLabel("null");
+        totalPane.add(ItemTotal, "cell 2 1");
+        JLabel PackagingTitle = new JLabel("Postage & Packing:");
+        totalPane.add(PackagingTitle, "Cell 1 2");
+        JLabel Packing£sign = new JLabel("£");
+        totalPane.add(Packing£sign, "split 2");
+        final JLabel PackagingTotal = new JLabel("00.00");
+        totalPane.add(PackagingTotal, "cell 2 2, wrap 15");
+        JSeparator TotalSeparator = new JSeparator(SwingConstants.HORIZONTAL);//Separator for different values.
+        TotalSeparator.setBackground(Color.CYAN);
+        totalPane.add(TotalSeparator, "cell 0 4,pushx, growx, span,wrap");//push x and grow x and span lets the separator take up more than one cell.
+        JLabel OrderTotalTitle = new JLabel("Order Total:");
+        totalPane.add(OrderTotalTitle, "cell 1 5");
+        JLabel Order£sign = new JLabel("£");
+        totalPane.add(Order£sign, "split 2");
+        final JLabel OrderTotal = new JLabel("null");
+        totalPane.add(OrderTotal, "wrap");
+        final JRadioButton StandardD = new JRadioButton("Standard Delivery");
+        totalPane.add(StandardD, "cell 1 6, wrap");
+        final JRadioButton ExpressD = new JRadioButton("Express Delivery");
+        totalPane.add(ExpressD, "cell 1 7");
+        ButtonGroup Delivery = new ButtonGroup();
+        Delivery.add(StandardD);
+        Delivery.add(ExpressD);
 
 
-            int i = 0;
-            for (Item.BasketItem bItem : basket.values()) {   //for the length of the HashMap passed in by basket this code will run and generate and display play the equivalent number of panels.
-                Ipanel[i] = new JPanel();
-                iNumLabel[i] = new JLabel();
-                iname[i] = new JLabel(bItem.getItem().getName());//Gets and displays name of item from hashmap
-                iNumlabelTitle[i] = new JLabel("Item Number:");
-                iImg[i] = new JLabel();//TODO place to put images.
-                i£Sign[i] = new JLabel("£");
-                IPrice[i] = new JLabel(String.valueOf(bItem.getItem().getPrice()));//gets and displays price of item
-                IQuantity[i] = new JLabel("Quantity:");
-                IQuantityNum[i] = new JLabel("null");
-                IQuantityNum[i].setText(String.valueOf(bItem.getQuantity()));//gets quantity of item
+        final JPanel[] Ipanel = new JPanel[100];//This creates an array of Java swing components
+        JLabel[] iNumLabel = new JLabel[100];
+        JLabel[] iNumlabelTitle = new JLabel[100];
+        JLabel[] iImg = new JLabel[100];
+        final JLabel[] iname = new JLabel[100];
+        JLabel[] i£Sign = new JLabel[100];
+        final JLabel[] IPrice = new JLabel[100];
+        JLabel[] IQuantity = new JLabel[100];
+        final JLabel[] IQuantityNum = new JLabel[100];
 
-                Ipanel[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));//gives each panel a border.
-                Ipanel[i].setLayout(new MigLayout());
-                iNumLabel[i].setText(String.valueOf(i));
-                Ipanel[i].add(iNumlabelTitle[i]); // doesn't need to be in an array
-                Ipanel[i].add(iNumLabel[i], "split 2");
-                Ipanel[i].add(iNumLabel[i], "wrap");
 
-                Ipanel[i].add(iname[i], "wrap");
-                Ipanel[i].add(i£Sign[i], "split 2");// doesn't need to be an array
-                Ipanel[i].add(IPrice[i], "wrap");
+        int i = 0;
+        for (Item.BasketItem bItem : basket.values()) {   //for the length of the HashMap passed in by basket this code will run and generate and display play the equivalent number of panels.
+            Ipanel[i] = new JPanel();
+            iNumLabel[i] = new JLabel();
+            iname[i] = new JLabel(bItem.getItem().getName());//Gets and displays name of item from hashmap
+            iNumlabelTitle[i] = new JLabel("Item Number:");
+            iImg[i] = new JLabel();//TODO place to put images.
+            i£Sign[i] = new JLabel("£");
+            IPrice[i] = new JLabel(String.valueOf(bItem.getItem().getPrice()));//gets and displays price of item
+            IQuantity[i] = new JLabel("Quantity:");
+            IQuantityNum[i] = new JLabel("null");
+            IQuantityNum[i].setText(String.valueOf(bItem.getQuantity()));//gets quantity of item
 
-                Ipanel[i].add(IQuantity[i], "split 2");//doesn't need to be in array
-                Ipanel[i].add(IQuantityNum[i]);
+            Ipanel[i].setBorder(BorderFactory.createLineBorder(Color.BLACK));//gives each panel a border.
+            Ipanel[i].setLayout(new MigLayout());
+            iNumLabel[i].setText(String.valueOf(i));
+            Ipanel[i].add(iNumlabelTitle[i]); // doesn't need to be in an array
+            Ipanel[i].add(iNumLabel[i], "split 2");
+            Ipanel[i].add(iNumLabel[i], "wrap");
 
-                itemCalc = Double.parseDouble(IPrice[i].getText());//Each time the code is run it gets the price and calculates it
-                itemCalc = itemCalc * bItem.getQuantity();// it then * the price by the quantity.
+            Ipanel[i].add(iname[i], "wrap");
+            Ipanel[i].add(i£Sign[i], "split 2");// doesn't need to be an array
+            Ipanel[i].add(IPrice[i], "wrap");
 
-                itemTotal += itemCalc; // and adds that into the itemTotal value not replacing it but adding it. via +=
+            Ipanel[i].add(IQuantity[i], "split 2");//doesn't need to be in array
+            Ipanel[i].add(IQuantityNum[i]);
 
-                itemPane.add(Ipanel[i]);
-                i++;//so the next panel in the array can be made, we increase I.
+            itemCalc = Double.parseDouble(IPrice[i].getText());//Each time the code is run it gets the price and calculates it
+            itemCalc = itemCalc * bItem.getQuantity();// it then * the price by the quantity.
+
+            itemTotal += itemCalc; // and adds that into the itemTotal value not replacing it but adding it. via +=
+
+            itemPane.add(Ipanel[i]);
+            i++;//so the next panel in the array can be made, we increase I.
+        }
+        ItemTotal.setText(new DecimalFormat("######.##").format(itemTotal));//sets item total in decimal format.
+        ChangeListener Change = new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                if (StandardD.isSelected()) {//Checks if Standard delivery is checked and calculates the new order Total
+                    postingTotal = 2.27 * basket.size();//The more items the more it costs.
+                    PackagingTotal.setText(new DecimalFormat("##.##").format(postingTotal));
+                    orderTotal = itemTotal + postingTotal;
+                    OrderTotal.setText(new DecimalFormat("##.##").format(orderTotal));
+                } else if (ExpressD.isSelected()) {//Checks if express delivery is checked and calculates the new order Total
+                    postingTotal = 3.73 * basket.size();
+                    PackagingTotal.setText(new DecimalFormat("##.##").format(postingTotal));
+                    orderTotal = itemTotal + postingTotal;
+                    OrderTotal.setText(new DecimalFormat("##.##").format(orderTotal));
+                }
+
             }
-            ItemTotal.setText(new DecimalFormat("######.##").format(itemTotal));//sets item total in decimal format.
-            ChangeListener Change = new ChangeListener() {
-                @Override
-                public void stateChanged(ChangeEvent e) {
-                    if (StandardD.isSelected()) {//Checks if Standard delivery is checked and calculates the new order Total
-                        postingTotal = 2.27 * basket.size();//The more items the more it costs.
-                        PackagingTotal.setText(new DecimalFormat("##.##").format(postingTotal));
-                        orderTotal = itemTotal + postingTotal;
-                        OrderTotal.setText(new DecimalFormat("##.##").format(orderTotal));
-                    } else if (ExpressD.isSelected()) {//Checks if express delivery is checked and calculates the new order Total
-                        postingTotal = 3.73 * basket.size();
-                        PackagingTotal.setText(new DecimalFormat("##.##").format(postingTotal));
-                        orderTotal = itemTotal + postingTotal;
-                        OrderTotal.setText(new DecimalFormat("##.##").format(orderTotal));
-                    }
 
+        };
+        StandardD.addChangeListener(Change);
+        ExpressD.addChangeListener(Change);
+        StandardD.doClick(); // Makes StandardD already selected so the calculation can happen immediatelyy.
+
+        ActionListener BuyNow = new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    for (int i = 0; i < basket.size(); i++) {
+                        HashMap<String, Object> query = new HashMap<String, Object>();
+                        query.put(jUSERID_COLUMN_NAME,User.getCurrentUser().getID());
+                        query.put(jItemID_COLUMN_NAME, iname[i].getText());
+                        query.put(jPRICE_COLUMN_NAME,IPrice[i].getText());
+                          query.put(jSTOCK_COLUMN_NAME,IQuantityNum[i].getText());
+                         query.put(jDATE_COLUMN_NAME,new Date(currentTimeMillis()));
+                        final DatabaseManager db = new DatabaseManager();
+                        DatabaseManager.createRecordInBackground(query, jTABLE_NAME, new DatabaseManager.CreateCompletionHandler() {
+                            @Override
+                            public void succeeded(int ID) {
+
+                            }
+                            @Override
+                            public void failed(SQLException exception) {
+//                                JOptionPane.showMessageDialog(getView(), "An error occurred Please try again later.");
+                                System.out.println(exception);
+
+                            }
+                        });
+
+                    }
+                    ApplicationManager.setDisplayedViewController(logInVC);
+
+                } catch (Exception ex) {
+                    out.println(ex);
                 }
 
-            };
-            StandardD.addChangeListener(Change);
-            ExpressD.addChangeListener(Change);
-            StandardD.doClick(); // Makes StandardD already selected so the calculation can happen immediatelyy.
+            }
+        };
 
-            ActionListener BuyNow = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    try {
-                        for (int i = 0; i < basket.size(); i++) {
-                            //TODO Kyles Insert Api.
-                            HashMap<String, Object> query = new HashMap<String, Object>();
-                            query.put(jUSERID_COLUMN_NAME,User.getCurrentUser().getID());
-                            query.put(jItemID_COLUMN_NAME, iname[i].getDisplayedMnemonic());
-                            query.put(jPRICE_COLUMN_NAME,IPrice[i].getText());
-                            query.put(jSTOCK_COLUMN_NAME,IQuantityNum[i].getDisplayedMnemonic());
-                            query.put(jDATE_COLUMN_NAME,new Date(currentTimeMillis()));
-
-                            //TODO Make database table, Create a handler?, I have tried but failed.
-                            // DatabaseManager.CreateCompletionHandler callback = new DatabaseManager.CreateCompletionHandler();
-                            //DatabaseManager.createRecordInBackground(query,jTABLE_NAME,callback);
-
-
-//                            String query = "Insert into Completed (UserID,ItemID,ItemPrice,Quantity,Date) values(?,?,?,?,?)";
-//                            PreparedStatement stm = DatabaseManager.getSharedDbConnection().prepareStatement(query);
-//                            stm.setInt(1, User.getCurrentUser().getID());
-//                            stm.setInt(2, iname[i].getDisplayedMnemonic());
-//                            String itemCost = IPrice[i].getText();
-//                            stm.setString(3, itemCost);
-//                            stm.setInt(4,IQuantityNum[i].getDisplayedMnemonic());
-//                            stm.setDate(5, new Date(currentTimeMillis()));
-//                            stm.execute();
-                        }
-
-                    } catch (Exception ex) {
-                        out.println(ex);
-                    }
-
-                }
-            };
-
-            OrderFinish.addActionListener(BuyNow);
+        OrderFinish.addActionListener(BuyNow);
 
 
     }
@@ -295,6 +295,3 @@ public class OrderCompletionViewController extends javax.swing.JFrame implements
 
 
 }
-
-
-
