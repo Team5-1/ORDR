@@ -1,11 +1,14 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.util.ArrayList;
+//import static java.awt.Color.white;
 
 
 /**
@@ -50,6 +53,7 @@ public class ItemTableViewController extends ViewController {
             @Override
             public void failed(SQLException exception) {
 
+
             }
         });
 
@@ -59,11 +63,12 @@ public class ItemTableViewController extends ViewController {
                  return (column == 0) ? Icon.class : Object.class;
             }
         };
-        table.setRowHeight(30);
+        table.setRowHeight(150);
         table.setRowSelectionAllowed(true);
         table.setAutoCreateRowSorter(true);
         table.getTableHeader().setReorderingAllowed(false);
-
+        table.getColumn("Image").setMinWidth(150);
+//        table.setSelectionBackground(white);
         scrollPane.setViewportView(table);
 
         table.addMouseListener(new MouseAdapter() {
