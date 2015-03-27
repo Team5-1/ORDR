@@ -12,7 +12,7 @@ import java.util.HashMap;
 /**
  * Created by aliyounas on 26/01/15.
  */
-public class BasketViewController extends JFrame implements ViewController {
+public class BasketViewController extends ViewController {
 
     private JButton checkOutButton;
     private JButton clearCartButton;
@@ -256,11 +256,6 @@ public class BasketViewController extends JFrame implements ViewController {
         pack();
     }
 
-    @Override
-    public Component getView() {
-        return getContentPane();
-    }
-
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
             @Override
@@ -281,10 +276,14 @@ public class BasketViewController extends JFrame implements ViewController {
         });
     }
 
-    /**
-     * @param args the command line arguments
-     */
+    //Getters
+    @Override
+    public Component getView() {
+        return getContentPane();
+    }
 
+    @Override
+    public String getButtonLabel() { return "Basket"; }
 }
 
 
