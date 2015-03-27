@@ -6,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by kylejm on 10/02/15.
  */
-public class LogInViewController extends ViewController {
+public class LogInViewController implements ViewController {
     private JPanel view;
     private JButton signInButton;
     private JTextField emailTF;
@@ -49,11 +49,7 @@ public class LogInViewController extends ViewController {
         });
     }
 
-    //Getters
     public JPanel getView() {
         return view;
     }
-
-    @Override
-    public String getButtonLabel() { return "Login"; }
 }

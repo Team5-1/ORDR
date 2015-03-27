@@ -164,8 +164,6 @@ public class User extends SQLObject {
         BackgroundQueue.addToQueue(new SQLQueryTask(query, callback));
     }
 
-
-    //Basket methods
     public void refreshBasketInBackground(final BasketRefreshCompletionHandler handler) {
         final User selfPointer = this;
         Item.BasketItem.fetchAllBasketItemsForUser(this, new Item.BasketItem.MultipleBasketItemCompletionHandler() {
@@ -192,22 +190,6 @@ public class User extends SQLObject {
         }
     }
 
-    public void emptyBasket(final DatabaseManager.SaveOrDeleteCompletionHandler handler) {
-        DatabaseManager.deleteSQLObjects(basketItems.values(), new DatabaseManager.SaveOrDeleteCompletionHandler() {
-            @Override
-            public void succeeded() {
-                basketItems = new HashMap<Integer, Item.BasketItem>();
-                handler.succeeded();
-            }
-
-            @Override
-            public void failed(SQLException exception) {
-                handler.failed(exception);
-            }
-        });
-
-    }
-
     public static boolean emailAddressIsValid(String emailAddress) {
         Pattern emailRegex = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailRegex.matcher(emailAddress);
@@ -220,7 +202,7 @@ public class User extends SQLObject {
 
     //SQLObject methods
     @Override
-    public void save(DatabaseManager.SaveOrDeleteCompletionHandler handler) {
+    public void save(DatabaseManager.SaveCompletionHandler handler) {
 
     }
 

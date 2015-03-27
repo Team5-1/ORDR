@@ -25,16 +25,15 @@ public class ItemTableViewController implements ViewController {
         table.getTableHeader().setReorderingAllowed(false);
 
         //Prevent cells from being edited
-//        table.setEnabled(true);
+        table.setEnabled(true);
         table.setRowSelectionAllowed(true);
-//        table.setCellSelectionEnabled(true);
-//        table.setColumnSelectionAllowed(true);
+        table.setCellSelectionEnabled(true);
+        table.setColumnSelectionAllowed(true);
 
         //Ability to sort each item according to column.
         table.setAutoCreateRowSorter(true);
 
         model = new DefaultTableModel();
-        model.addColumn("Image");
         model.addColumn("Name");
         model.addColumn("Description");
         model.addColumn("Price");
@@ -47,7 +46,6 @@ public class ItemTableViewController implements ViewController {
                 selfPointer.items = items;
                 for (Item item : items) {
                     model.addRow(new Object[] {item.getName(), item.getDescription(),item.getPrice(), item.getStockQty()});
-
                 }
 
                 //Setting the height of table rows.
@@ -62,24 +60,32 @@ public class ItemTableViewController implements ViewController {
             }
         });
 
-        table.addMouseListener(new MouseAdapter() {
-
+        ListSelectionModel cellSelectionModel = table.getSelectionModel();
+        cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
             @Override
-            public void mouseClicked(MouseEvent e) {
+            public void valueChanged(ListSelectionEvent e) {
+                JFrame newItem = null;
+//                if(Table == null)
+//                    newItem = new JFrame();
+//                else {
+//                    //remove the previous JFrame
+//                    Table.setVisible(false);
+//                    newItem.dispose();
+//                    //create a new one
+//                    newItem = new JFrame();
+//
+//                }
+
+//                JFrame newItem = new JFrame("Item Description");
                 int selectedRow = table.getSelectedRow();
-                if (selectedRow > -1) {
-                    ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
-                    ApplicationManager.setDisplayedViewController(detailVC);
-                }
-//                ListSelectionModel cellSelectionModel = table.getSelectionModel();
-//                cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//                cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
-//                    @Override
-//                    public void valueChanged(ListSelectionEvent e) {
+                ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
+                ApplicationManager.setDisplayedViewController(detailVC);
+//                newItem.setSize(850,500);
+//                newItem.setVisible(true);
 //
-//
-//                    }
-//                });
+//                table.setVisible(false);
+//                view.setVisible(false);
             }
         });
     }
@@ -88,7 +94,5 @@ public class ItemTableViewController implements ViewController {
     public JPanel getView() {
         return view;
     }
-
-
 }
 

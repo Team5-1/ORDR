@@ -6,7 +6,7 @@ import java.sql.SQLException;
 /**
  * Created by kylejm on 18/02/15.
  */
-public class CreateAccountViewController extends ViewController {
+public class CreateAccountViewController implements ViewController {
     private JTextField firstNameTF;
     private JPanel view;
     private JTextField lastNameTF;
@@ -51,11 +51,7 @@ public class CreateAccountViewController extends ViewController {
         });
     }
 
-    //Getters
     public JPanel getView() {
         return view;
     }
-
-    @Override
-    public String getButtonLabel() { return "Create Account"; }
 }

@@ -4,14 +4,13 @@ import javax.swing.*;
 import javax.swing.event.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.sql.SQLException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 
 /**
  * Created by James on 13/02/2015.
  */
-public class OrderCompletionViewController extends ViewController {
+public class OrderCompletionViewController extends javax.swing.JFrame implements ViewController {
 
     public OrderCompletionViewController(HashMap<Integer, Item.BasketItem> basket) throws HeadlessException {
         //TODO: Either get rid of Headless exception of handle it
@@ -269,7 +268,6 @@ public class OrderCompletionViewController extends ViewController {
 
     }
 
-    //Getters
     @Override
     public Component getView() {
         return getContentPane();
