@@ -14,38 +14,26 @@ import java.util.HashMap;
  */
 public class BasketViewController extends ViewController {
 
-    private JButton checkOutButton;
-    private JButton clearCartButton;
-    private JScrollPane jScrollPane1;
-    private JButton removeSelectedButton;
-    private JLabel shoppingCartLabel;
-    private JTable shoppingCartTable;
-    private JLabel splitLabel;
-    private JLabel totalLabel;
     private JLabel totalValueLabel;
-    private JLabel storeLabel;
-    private JButton updateOrder;
+    private double totalValue = 0.0;
+    final private JTable table = new JTable();
+    JLabel storeLabel = new javax.swing.JLabel();
 
-    public double totalValue =0.0;
-
-    public BasketViewController() {
-        initComponents();
-    }
+    public BasketViewController() { initComponents(); }
 
 
     private void initComponents() {
 
-        jScrollPane1 = new javax.swing.JScrollPane();
-        shoppingCartTable = new javax.swing.JTable();
-        shoppingCartLabel = new javax.swing.JLabel();
-        totalLabel = new javax.swing.JLabel();
+        //Init table
+        JScrollPane scrollPane = new javax.swing.JScrollPane();
+        JLabel shoppingCartLabel = new javax.swing.JLabel();
+        JLabel totalLabel = new javax.swing.JLabel();
         totalValueLabel = new javax.swing.JLabel();
-        checkOutButton = new javax.swing.JButton();
-        removeSelectedButton = new javax.swing.JButton();
-        storeLabel = new javax.swing.JLabel();
-        clearCartButton = new javax.swing.JButton();
-        splitLabel = new javax.swing.JLabel();
-        updateOrder = new javax.swing.JButton();
+        JButton checkOutButton = new javax.swing.JButton();
+        JButton removeSelectedButton = new javax.swing.JButton();
+        JButton clearCartButton = new javax.swing.JButton();
+        JLabel splitLabel = new javax.swing.JLabel();
+        JButton updateOrder = new javax.swing.JButton();
 
 
 
@@ -53,47 +41,23 @@ public class BasketViewController extends ViewController {
         //LOOK HERE!
         //TODO
 
-        int i = 0;
-
         totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
         totalValueLabel.setText("£0.00");
 
 
-        if (User.getCurrentUser() == null) {
-            storeLabel.setText("NOT LOGGED IN");
 
-        } else {
-            final HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
-            if (basket != null && basket.size() > 0) {
-
-                final DefaultTableModel model = new DefaultTableModel();
-
-                model.addColumn("Name");
-                model.addColumn("Price");
-                model.addColumn("Quantity");
-                for (Item.BasketItem bItem : basket.values()) {
-
-                    Double itemPrice = bItem.getItem().getPrice();
-                    model.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
-                    totalValue = totalValue + itemPrice;
-                    totalValueLabel.setText("£" + String.format("%.2f", totalValue));
-                    i++;
-                }
-
-                shoppingCartTable.setModel(model);
-
-                removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
 //                        int in = shoppingCartTable.getSelectedRow();
 //                        System.out.println(in + "selected row");
 //                        model.removeRow(in);
 //                        items.remove(in);
 //                        updateOrder.doClick();
-                    }
-                });
+            }
+        });
 
-                clearCartButton.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
+        clearCartButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
 //                        int totalRows = shoppingCartTable.getRowCount();
 //                        for (int i = 0; totalRows > i; i++) {
 //
@@ -101,40 +65,24 @@ public class BasketViewController extends ViewController {
 //                            items.remove(i);
 //                            updateOrder.doClick();
 //                        }
-                    }
-                });
-
-
-                updateOrder.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        int totalRows = shoppingCartTable.getRowCount();
-                        System.out.println(totalRows + "total rows");
-
-                        double totalValue = 0.0;
-
-                        //
-                        for (Item.BasketItem bItem : basket.values()) {
-                            for (int i = 0; i < totalRows; i++) {
-                                //totalValue = totalValue + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * bItem.getItem(i).getPrice();
-                        }
-                        totalValueLabel.setText("£" + String.format("%.2f", totalValue));
-
-                        }
-                    }
-                });
-
-                checkOutButton.addActionListener(new java.awt.event.ActionListener() {
-                    public void actionPerformed(java.awt.event.ActionEvent evt) {
-                        checkOutButtonActionPerformed(evt);
-                    }
-                });
-
-                storeLabel.setText("ORDR Basket");
-            } else {
-                storeLabel.setText("Empty Basket");
             }
+        });
 
-        }
+
+        updateOrder.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                int totalRows = table.getRowCount();
+                System.out.println(totalRows + "total rows");
+
+                totalValue = 0.0;
+            }
+        });
+
+        checkOutButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                checkOutButtonActionPerformed(evt);
+            }
+        });
 //
 
 //        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
@@ -222,7 +170,7 @@ public class BasketViewController extends ViewController {
 
         //shoppingCartTable.setModel(model);
 
-        jScrollPane1.setViewportView(shoppingCartTable);
+        scrollPane.setViewportView(table);
 
         shoppingCartLabel.setText("Shopping Cart");
 
@@ -258,7 +206,7 @@ public class BasketViewController extends ViewController {
                                                                                 .addComponent(storeLabel))))
                                                         .addComponent(shoppingCartLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                                .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                                 .addGroup(layout.createSequentialGroup()
                                                                         .addComponent(updateOrder)
                                                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -296,7 +244,7 @@ public class BasketViewController extends ViewController {
                                                 .addGap(18, 18, 18)
                                                 .addComponent(shoppingCartLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(scrollPane, javax.swing.GroupLayout.PREFERRED_SIZE, 152, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(removeSelectedButton)
@@ -320,14 +268,29 @@ public class BasketViewController extends ViewController {
         pack();
     }
 
-    @Override
-    public Component getView() {
-        return getContentPane();
-    }
+    private void refreshTableData() {
+        DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel.addColumn("Name");
+        tableModel.addColumn("Price");
+        tableModel.addColumn("Quantity");
+        if (User.getCurrentUser() != null) {
+            HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
+            if (basket != null && basket.size() > 0) {
+                for (Item.BasketItem bItem : basket.values()) {
 
-    @Override
-    public String getButtonLabel() {
-        return "Basket";
+                    Double itemPrice = bItem.getItem().getPrice();
+                    tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
+                    totalValue = totalValue + itemPrice;
+                    totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                }
+                storeLabel.setText("");
+            } else {
+                storeLabel.setText("Your basket is empty");
+            }
+        } else {
+            storeLabel.setText("Please log in to add items to your basket");
+        }
+        table.setModel(tableModel);
     }
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
@@ -339,7 +302,7 @@ public class BasketViewController extends ViewController {
                     Item.BasketItem bItem = Item.BasketItem.makeBasketItem(30, item, 3);
                     basket.put(item.getID(), bItem);
                 }
-                 if (User.getCurrentUser() != null) {
+                if (User.getCurrentUser() != null) {
                     OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
                     ApplicationManager.setDisplayedViewController(orderVC);
                 }else {
@@ -354,10 +317,21 @@ public class BasketViewController extends ViewController {
         });
     }
 
-    /**
-     * @param args the command line arguments
-     */
+    @Override
+    public void viewWillAppear() {
+        refreshTableData();
+    }
 
+    //Getters
+    @Override
+    public Component getView() {
+        return getContentPane();
+    }
+
+    @Override
+    public String getButtonLabel() {
+        return "Basket";
+    }
 }
 
 
