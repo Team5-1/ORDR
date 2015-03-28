@@ -187,6 +187,7 @@ public class User extends SQLObject {
         if (basketItems.containsKey(item.getID())) {
             Item.BasketItem bItem = basketItems.get(item.getID());
             bItem.setQuantity(bItem.getQuantity() + quantity);
+            bItem.save();
         } else {
             basketItems.put(item.getID(), Item.BasketItem.makeBasketItem(getID(), item, quantity));
         }

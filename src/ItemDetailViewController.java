@@ -2,6 +2,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 
 /**
  * Created by MaywandA on 19/02/15.
@@ -13,7 +15,7 @@ public class ItemDetailViewController extends ViewController {
     private JComboBox quantityCmb;
     private JPanel panel;
     private JLabel priceTotalLabel;
-    private JButton BasketButton;
+    private JButton addToBasketButton;
     private JPanel BottomPanel;
     private JLabel logoLabel;
     final private Item item;
@@ -38,6 +40,15 @@ public class ItemDetailViewController extends ViewController {
                     priceTotalLabel.setText("£" + (Integer.parseInt(quantity) * item.getPrice()));
                 }
 
+            }
+        });
+        addToBasketButton.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                String selectedItem = quantityCmb.getSelectedItem().toString();
+                if (User.getCurrentUser() != null && !selectedItem.equalsIgnoreCase("Quantity Needed:")) {
+                    User.getCurrentUser().addToBasket(item, Integer.parseInt(selectedItem));
+                }
             }
         });
     }
