@@ -203,35 +203,17 @@ public class OrderCompletionViewController extends ViewController {
         ActionListener BuyNow = new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                try {
-                    for (int i = 0; i < basket.size(); i++) {
-                        HashMap<String, Object> query = new HashMap<String, Object>();
-                        query.put(jUSERID_COLUMN_NAME,User.getCurrentUser().getID());
-                        query.put(jItemID_COLUMN_NAME, iname[i].getText());
-                        query.put(jPRICE_COLUMN_NAME,IPrice[i].getText());
-                          query.put(jSTOCK_COLUMN_NAME,IQuantityNum[i].getText());
-                         query.put(jDATE_COLUMN_NAME,new Date(currentTimeMillis()));
-                        final DatabaseManager db = new DatabaseManager();
-                        DatabaseManager.createRecordInBackground(query, jTABLE_NAME, new DatabaseManager.CreateCompletionHandler() {
-                            @Override
-                            public void succeeded(int ID) {
+                Order.placeOrderWithUser(User.getCurrentUser(), new Order.OrderPlacementCompletionHandler() {
+                    @Override
+                    public void succeeded(Order order) {
+                        ApplicationManager.displayViewControllerAtIndex(0);
+                    }
 
-                            }
-                            @Override
-                            public void failed(SQLException exception) {
-//                                JOptionPane.showMessageDialog(getView(), "An error occurred Please try again later.");
-                                System.out.println(exception);
-
-                            }
-                        });
+                    @Override
+                    public void failed(SQLException exception) {
 
                     }
-                    ApplicationManager.setDisplayedViewController(logInVC);
-
-                } catch (Exception ex) {
-                    out.println(ex);
-                }
-
+                });
             }
         };
 

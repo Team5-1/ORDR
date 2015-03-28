@@ -294,27 +294,13 @@ public class BasketViewController extends ViewController {
     }
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
-            @Override
-            public void succeeded(ArrayList<Item> items) {
-                HashMap<Integer, Item.BasketItem> basket = new HashMap<Integer, Item.BasketItem>(items.size());
-                for (Item item : items) {
-                    Item.BasketItem bItem = Item.BasketItem.makeBasketItem(30, item, 3);
-                    basket.put(item.getID(), bItem);
-                }
-                if (User.getCurrentUser() != null) {
-                    OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
-                    ApplicationManager.setDisplayedViewController(orderVC);
-                }else {
-                    JOptionPane.showMessageDialog(getView(), "Please login before trying to checkout.");
-                }
+        if (User.getCurrentUser() != null) {
+            HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
+            if (basket.size() > 0) {
+                OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
+                ApplicationManager.setDisplayedViewController(orderVC);
             }
-
-            @Override
-            public void failed(SQLException exception) {
-
-            }
-        });
+        }
     }
 
     @Override

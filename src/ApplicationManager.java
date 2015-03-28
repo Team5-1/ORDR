@@ -57,4 +57,8 @@ public class ApplicationManager {
         navView.add(vcButton, BorderLayout.NORTH);
     }
 
+    public static void displayViewControllerAtIndex(int index) {
+        setDisplayedViewController(navViewControllers.get(index));
+    }
+
 }
