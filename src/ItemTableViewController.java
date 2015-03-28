@@ -49,7 +49,7 @@ public class ItemTableViewController extends ViewController {
                     });
                 }
 
-                //Setting the height of table rows.
+
             }
 
             @Override
@@ -65,23 +65,37 @@ public class ItemTableViewController extends ViewController {
                  return (column == 0) ? Icon.class : Object.class;
             }
         };
+        //Setting the height of table rows.
         table.setRowHeight(150);
         table.setRowSelectionAllowed(true);
+        //Ability to sort by row.
         table.setAutoCreateRowSorter(true);
+        //Prevent reordering of columns.
         table.getTableHeader().setReorderingAllowed(false);
         table.getColumn("Image").setMinWidth(150);
         scrollPane.setViewportView(table);
+//        table.setSelectionForeground(black);
+//        table.setSelectionBackground(white);
+//        table.setShowHorizontalLines(false);
+//        table.setShowVerticalLines(false);
+
+
         table.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-                table.setSelectionForeground(black);
-                table.setSelectionBackground(white);
+//                table.setSelectionForeground(black);
+//                table.setSelectionBackground(white);
+//                table.setShowHorizontalLines(false);
+//                table.setShowVerticalLines(false);
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow > -1) {
                     ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
                     ApplicationManager.setDisplayedViewController(detailVC);
                 }
+                //Get the selected row and clear it when user clicks on product.
+                table.getSelectedRows();
+                table.clearSelection();
 //                ListSelectionModel cellSelectionModel = table.getSelectionModel();
 //                cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 //                cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
@@ -91,6 +105,7 @@ public class ItemTableViewController extends ViewController {
 //
 //                    }
 //                });
+
             }
         });
     }
