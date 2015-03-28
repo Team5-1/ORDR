@@ -279,7 +279,7 @@ public class BasketViewController extends ViewController {
                 for (Item.BasketItem bItem : basket.values()) {
 
                     Double itemPrice = bItem.getItem().getPrice();
-                    tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, '1'});
+                    tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, bItem.getQuantity()});
                     totalValue = totalValue + itemPrice;
                     totalValueLabel.setText("£" + String.format("%.2f", totalValue));
                 }
