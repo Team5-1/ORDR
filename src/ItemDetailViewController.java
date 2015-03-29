@@ -11,7 +11,7 @@ import java.awt.event.MouseEvent;
 public class ItemDetailViewController extends ViewController {
     private JLabel itemName;
     private JLabel price;
-    private JLabel itemDescription;
+    private JTextArea itemDescription;
     private JComboBox quantityCmb;
     private JPanel panel;
     private JLabel priceTotalLabel;
@@ -36,7 +36,7 @@ public class ItemDetailViewController extends ViewController {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 String quantity = e.getItem().toString();
-                if (!quantity.equalsIgnoreCase("Quantity Needed:")) {
+                if (!quantity.equalsIgnoreCase("")) {
                     priceTotalLabel.setText("£" + (Integer.parseInt(quantity) * item.getPrice()));
                 }
 
@@ -57,6 +57,9 @@ public class ItemDetailViewController extends ViewController {
         itemName.setText(item.getName());
         itemDescription.setText(item.getDescription());
         price.setText("£ " + item.getPrice());
+        itemDescription.setEditable(false);
+        itemDescription.setLineWrap(true);
+        itemDescription.setWrapStyleWord(true);
     }
 
 
