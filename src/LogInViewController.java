@@ -21,6 +21,7 @@ public class LogInViewController extends ViewController {
                     @Override
                     public void succeeded(User user) {
                         ordrLabel.setText("Welcome " + user.getFirstName());
+                        ApplicationManager.setUserLoggedIn(true);
                     }
 
                     @Override

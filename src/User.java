@@ -108,6 +108,10 @@ public class User extends SQLObject {
 
     }
 
+    public static void logOutCurrentUser() {
+        currentUser = null;
+    }
+
     public void signUpInBackground(final String password, final SignUpCompletionHandler handler) {
         //Validation
         if (ID != 0) {
