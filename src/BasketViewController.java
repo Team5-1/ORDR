@@ -269,28 +269,46 @@ public class BasketViewController extends ViewController {
     }
 
     private void refreshTableData() {
-        DefaultTableModel tableModel = new DefaultTableModel();
+        final DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("Name");
         tableModel.addColumn("Price");
         tableModel.addColumn("Quantity");
         if (User.getCurrentUser() != null) {
-            HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
-            if (basket != null && basket.size() > 0) {
-                for (Item.BasketItem bItem : basket.values()) {
+            final Runnable showBasket = new Runnable() {
+                @Override
+                public void run() {
+                    HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
+                    if (basket != null && basket.size() > 0) {
+                        for (Item.BasketItem bItem : basket.values()) {
 
-                    Double itemPrice = bItem.getItem().getPrice();
-                    tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, bItem.getQuantity()});
-                    totalValue = totalValue + itemPrice;
-                    totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                            Double itemPrice = bItem.getItem().getPrice();
+                            tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, bItem.getQuantity()});
+                            totalValue = totalValue + itemPrice;
+                            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                        }
+                        storeLabel.setText("");
+                    } else {
+                        storeLabel.setText("Your basket is empty");
+                    }
+                    table.setModel(tableModel);
                 }
-                storeLabel.setText("");
-            } else {
-                storeLabel.setText("Your basket is empty");
-            }
+            };
+            User.getCurrentUser().refreshBasketInBackground(new User.BasketRefreshCompletionHandler() {
+                @Override
+                public void succeeded() {
+                    showBasket.run();
+                }
+
+                @Override
+                public void failed(SQLException exception) {
+                    showBasket.run();
+                    storeLabel.setText("Unable to refresh basket");
+
+                }
+            });
         } else {
             storeLabel.setText("Please log in to add items to your basket");
         }
-        table.setModel(tableModel);
     }
 
     private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
