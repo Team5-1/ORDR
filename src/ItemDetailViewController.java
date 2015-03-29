@@ -14,7 +14,6 @@ public class ItemDetailViewController extends ViewController {
     private JLabel priceTotalLabel;
     private JButton BasketButton;
     private JPanel BottomPanel;
-    private JLabel logoLabel;
     private JLabel itemImgDisplay;
     private JLabel ordrLbl;
     final private Item item;
@@ -31,7 +30,7 @@ public class ItemDetailViewController extends ViewController {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 String quantity = e.getItem().toString();
-                if (!quantity.equalsIgnoreCase("Quantity Needed:")) {
+                if (!quantity.equalsIgnoreCase("")) {
                     priceTotalLabel.setText("£" + (Integer.parseInt(quantity) * item.getPrice()));
                 }
 
@@ -41,7 +40,7 @@ public class ItemDetailViewController extends ViewController {
 
     public void populateField() {
         itemName.setText(item.getName());
-//        itemImgDisplay.setIcon(item.getImage());
+        itemImgDisplay.setIcon(item.getImage());
         itemDescription.setText(item.getDescription());
         price.setText("£ " + item.getPrice());
         itemDescription.setText(item.getDescription());
