@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 
@@ -16,6 +15,8 @@ public class ItemDetailViewController extends ViewController {
     private JButton BasketButton;
     private JPanel BottomPanel;
     private JLabel logoLabel;
+    private JLabel itemImgDisplay;
+    private JLabel ordrLbl;
     final private Item item;
 
 
@@ -26,11 +27,6 @@ public class ItemDetailViewController extends ViewController {
     }
 
     public void initialiseView() {
-        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
-        Image img = icon.getImage();
-        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
-        ImageIcon newIcon = new ImageIcon(newImage);
-        logoLabel.setIcon(newIcon);
         quantityCmb.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
@@ -45,6 +41,11 @@ public class ItemDetailViewController extends ViewController {
 
     public void populateField() {
         itemName.setText(item.getName());
+<<<<<<< HEAD
+=======
+        itemImgDisplay.setIcon(item.getImage());
+        itemDescription.setText(item.getDescription());
+>>>>>>> Re-styled pages : LogIn, Signup, ItemList and ItemView
         price.setText("£ " + item.getPrice());
         itemDescription.setText(item.getDescription());
         itemDescription.setEditable(false);

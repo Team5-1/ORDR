@@ -12,6 +12,7 @@ public class LogInViewController extends ViewController {
     private JTextField emailTF;
     private JTextField passwordTF;
     private JLabel ordrLabel;
+    private JLabel ordrLbl;
 
     public LogInViewController() {
         signInButton.addMouseListener(new MouseAdapter() {

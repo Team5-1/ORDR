@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -11,7 +10,7 @@ import java.awt.event.ActionListener;
 public class ContactForm extends ViewController {
     private JLabel ordrLbl;
     private JPanel mainPanel;
-    private JLabel contactLbl;
+    private JLabel headingLbl;
     private JLabel formLbl;
     private JLabel firstNameLbl;
     private JPanel leftForm_panel;
@@ -24,7 +23,6 @@ public class ContactForm extends ViewController {
     private JTextField surnameFill;
     private JTextField emailFill;
     private JLabel errorLbl;
-    private JLabel logoLbl;
     private JTextField firstNameFill;
     private JPanel infoPanel;
     private JLabel contactDetailLbl;
@@ -33,18 +31,20 @@ public class ContactForm extends ViewController {
     private JLabel commentLbl;
     private JLabel contact;
 
-
+//
 //    private void createUIComponents() {
 //        TODO: place custom component creation code here
 //    }
 
-    public void initialiseView() {
-        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
-        Image img = icon.getImage();
-        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
-        ImageIcon newIcon = new ImageIcon(newImage);
-        logoLbl.setIcon(newIcon);
-        }
+//    public void initialiseView() {
+//
+//        ImageIcon icon = new ImageIcon("../ORDR/ORDR_Logo.png");
+//        Image img = icon.getImage();
+//        Image newImage = img.getScaledInstance(70,70, Image.SCALE_SMOOTH);
+//        ImageIcon newIcon = new ImageIcon(newImage);
+//        logoLabel.setIcon(newIcon);
+//
+//        }
 
     public ContactForm() {
 
