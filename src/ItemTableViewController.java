@@ -74,20 +74,12 @@ public class ItemTableViewController extends ViewController {
         table.getTableHeader().setReorderingAllowed(false);
         table.getColumn("Image").setMinWidth(150);
         scrollPane.setViewportView(table);
-//        table.setSelectionForeground(black);
-//        table.setSelectionBackground(white);
-//        table.setShowHorizontalLines(false);
-//        table.setShowVerticalLines(false);
-
-
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
-//                table.setSelectionForeground(black);
-//                table.setSelectionBackground(white);
-//                table.setShowHorizontalLines(false);
-//                table.setShowVerticalLines(false);
+
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow > -1) {
                     ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
@@ -96,16 +88,6 @@ public class ItemTableViewController extends ViewController {
                 //Get the selected row and clear it when user clicks on product.
                 table.getSelectedRows();
                 table.clearSelection();
-//                ListSelectionModel cellSelectionModel = table.getSelectionModel();
-//                cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//                cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
-//                    @Override
-//                    public void valueChanged(ListSelectionEvent e) {
-//
-//
-//                    }
-//                });
-
             }
         });
     }

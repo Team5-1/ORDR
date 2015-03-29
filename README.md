@@ -11,7 +11,7 @@ The completed implementation is due for the 30th of March 2015. The team has com
 - [Kyle McAlpine](http://kylejm.io) (*Lead Programmer*)
 - [Ali Younas](https://github.com/aliyounas) (*Chief Architect*)
 - [Maywand Amin](https://github.com/MaywandAmin) (*GUI Designer*)
-- James Buchanan (*Software Engineer*)
+- [James Buchanan](https://github.com/Just-James) (*Software Engineer*)
 - Fariha Ahmad (*Database Designer*)
 
 The roles of the team members were elected by the team internally, apart from Kyle and Ali's roles which were selected by the faculty.
