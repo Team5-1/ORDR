@@ -323,12 +323,26 @@ public class Item extends SQLObject {
             super.save(new DatabaseManager.SaveOrDeleteCompletionHandler() {
                 @Override
                 public void succeeded() {
-
+                    //TODO
                 }
 
                 @Override
                 public void failed(SQLException exception) {
+                    //TODO
+                }
+            });
+        }
 
+        public void delete() {
+            super.delete(new DatabaseManager.SaveOrDeleteCompletionHandler() {
+                @Override
+                public void succeeded() {
+                    //TODO
+                }
+
+                @Override
+                public void failed(SQLException exception) {
+                    //TODO
                 }
             });
         }

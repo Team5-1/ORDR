@@ -41,11 +41,8 @@ public class ItemDetailViewController extends ViewController {
 
     public void populateField() {
         itemName.setText(item.getName());
-<<<<<<< HEAD
-=======
-        itemImgDisplay.setIcon(item.getImage());
+//        itemImgDisplay.setIcon(item.getImage());
         itemDescription.setText(item.getDescription());
->>>>>>> Re-styled pages : LogIn, Signup, ItemList and ItemView
         price.setText("£ " + item.getPrice());
         itemDescription.setText(item.getDescription());
         itemDescription.setEditable(false);

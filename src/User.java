@@ -197,6 +197,11 @@ public class User extends SQLObject {
         }
     }
 
+    public void removeItemFromBasket(Item.BasketItem bItem) {
+        bItem.delete();
+        basketItems.remove(bItem.getItem().getID());
+    }
+
     public void emptyBasket(final DatabaseManager.SaveOrDeleteCompletionHandler handler) {
         DatabaseManager.deleteSQLObjects(basketItems.values(), new DatabaseManager.SaveOrDeleteCompletionHandler() {
             @Override

@@ -4,6 +4,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -13,8 +14,10 @@ public class BasketViewController extends ViewController {
 
     private JLabel totalPriceLabel = new JLabel();
     private double totalPrice = 0.0;
-    final private JTable table = new JTable();
-    JLabel statusLabel = new JLabel();
+    private final JTable table = new JTable();
+    private JLabel statusLabel = new JLabel();
+    private DefaultTableModel tableModel;
+    private ArrayList<Item.BasketItem> orderedBasket;
 
     public BasketViewController() { initComponents(); }
 
@@ -37,23 +40,21 @@ public class BasketViewController extends ViewController {
 
         removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        int in = shoppingCartTable.getSelectedRow();
-//                        System.out.println(in + "selected row");
-//                        model.removeRow(in);
-//                        items.remove(in);
-//                        updateOrder.doClick();
+                if (User.getCurrentUser() != null && table.getSelectedRow() > -1) {
+                    Item.BasketItem selectedBItem = orderedBasket.get(table.getSelectedRow());
+                    User.getCurrentUser().removeItemFromBasket(selectedBItem);
+                    orderedBasket.remove(table.getSelectedRow());
+                    tableModel.removeRow(table.getSelectedRow());
+                    if (orderedBasket.size() == 0) {
+                        statusLabel.setText("Your basket is empty");
+                    }
+                }
             }
         });
 
         clearCartButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-//                        int totalRows = shoppingCartTable.getRowCount();
-//                        for (int i = 0; totalRows > i; i++) {
-//
-//                            model.removeRow(0);
-//                            items.remove(i);
-//                            updateOrder.doClick();
-//                        }
+
             }
         });
 
@@ -62,7 +63,6 @@ public class BasketViewController extends ViewController {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 int totalRows = table.getRowCount();
                 System.out.println(totalRows + "total rows");
-
                 totalPrice = 0.0;
             }
         });
@@ -258,12 +258,15 @@ public class BasketViewController extends ViewController {
     }
 
     private void refreshTableData() {
-        final DefaultTableModel tableModel = new DefaultTableModel();
+        tableModel = new DefaultTableModel();
         tableModel.addColumn("Name");
         tableModel.addColumn("Price");
         tableModel.addColumn("Quantity");
         table.setModel(tableModel);
+        orderedBasket = new ArrayList<Item.BasketItem>();
+
         if (User.getCurrentUser() != null) {
+
             final Runnable showBasket = new Runnable() {
                 @Override
                 public void run() {
@@ -274,6 +277,7 @@ public class BasketViewController extends ViewController {
                             Double itemPrice = bItem.getItem().getPrice();
                             tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, bItem.getQuantity()});
                             totalPrice += itemPrice * bItem.getQuantity();
+                            orderedBasket.add(bItem);
                         }
                         totalPriceLabel.setText("£" + String.format("%.2f", totalPrice));
                         statusLabel.setText("");
@@ -283,6 +287,7 @@ public class BasketViewController extends ViewController {
                     }
                 }
             };
+
             User.getCurrentUser().refreshBasketInBackground(new User.BasketRefreshCompletionHandler() {
                 @Override
                 public void succeeded() {
@@ -293,9 +298,9 @@ public class BasketViewController extends ViewController {
                 public void failed(SQLException exception) {
                     showBasket.run();
                     statusLabel.setText("Unable to refresh basket");
-
                 }
             });
+
         } else {
             statusLabel.setText("Please log in to add items to your basket");
             totalPriceLabel.setText("");
