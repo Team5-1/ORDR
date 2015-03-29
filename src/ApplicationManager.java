@@ -78,6 +78,7 @@ public class ApplicationManager {
                     public void mouseClicked(MouseEvent e) {
                         User.logOutCurrentUser();
                         setUserLoggedIn(false);
+                        displayedViewController.viewWillAppear();
                     }
                 });
                 navView.add(logOutButton, BorderLayout.NORTH, 0);

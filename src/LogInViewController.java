@@ -20,8 +20,8 @@ public class LogInViewController extends ViewController {
                 User.logInInBackground(emailTF.getText(), passwordTF.getText(), new User.LogInCompletionHandler() {
                     @Override
                     public void succeeded(User user) {
-                        ordrLabel.setText("Welcome " + user.getFirstName());
                         ApplicationManager.setUserLoggedIn(true);
+                        ApplicationManager.displayViewControllerAtIndex(0);
                     }
 
                     @Override
