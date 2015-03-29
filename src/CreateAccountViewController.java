@@ -15,6 +15,7 @@ public class CreateAccountViewController extends ViewController {
     private JPasswordField confirmPasswordTF;
     private JButton createAccountButton;
     private JLabel messageLabel;
+    private JLabel ordrLbl;
 
     public CreateAccountViewController() {
         createAccountButton.addMouseListener(new MouseAdapter() {
