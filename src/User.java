@@ -108,6 +108,10 @@ public class User extends SQLObject {
 
     }
 
+    public static void logOutCurrentUser() {
+        currentUser = null;
+    }
+
     public void signUpInBackground(final String password, final SignUpCompletionHandler handler) {
         //Validation
         if (ID != 0) {
@@ -187,6 +191,7 @@ public class User extends SQLObject {
         if (basketItems.containsKey(item.getID())) {
             Item.BasketItem bItem = basketItems.get(item.getID());
             bItem.setQuantity(bItem.getQuantity() + quantity);
+            bItem.save();
         } else {
             basketItems.put(item.getID(), Item.BasketItem.makeBasketItem(getID(), item, quantity));
         }

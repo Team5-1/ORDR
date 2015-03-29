@@ -1,11 +1,16 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
 import java.util.ArrayList;
+import static java.awt.Color.black;
+import static java.awt.Color.white;
 
 
 /**
@@ -21,17 +26,6 @@ public class ItemTableViewController extends ViewController {
     private ArrayList<Item> items;
 
     public ItemTableViewController() {
-        //Prevent movement of columns
-        table.getTableHeader().setReorderingAllowed(false);
-
-        //Prevent cells from being edited
-//        table.setEnabled(true);
-        table.setRowSelectionAllowed(true);
-//        table.setCellSelectionEnabled(true);
-//        table.setColumnSelectionAllowed(true);
-
-        //Ability to sort each item according to column.
-        table.setAutoCreateRowSorter(true);
 
         model = new DefaultTableModel();
         model.addColumn("Image");
@@ -43,43 +37,57 @@ public class ItemTableViewController extends ViewController {
         final ItemTableViewController selfPointer = this;
         Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
             @Override
-            public void succeeded(ArrayList <Item> items) {
+            public void succeeded(ArrayList<Item> items) {
                 selfPointer.items = items;
                 for (Item item : items) {
-                    model.addRow(new Object[] {item.getName(), item.getDescription(),item.getPrice(), item.getStockQty()});
-
+                    model.addRow(new Object[]{
+                            item.getImage(),
+                            item.getName(),
+                            item.getDescription(),
+                            item.getPrice(),
+                            item.getStockQty()
+                    });
                 }
 
-                //Setting the height of table rows.
-                table.setRowHeight(30);
-                table.setModel(model);
 
             }
 
             @Override
             public void failed(SQLException exception) {
 
+
             }
         });
 
+        table = new JTable(model) {
+            @Override
+            public Class<?> getColumnClass(int column) {
+                 return (column == 0) ? Icon.class : Object.class;
+            }
+        };
+        //Setting the height of table rows.
+        table.setRowHeight(150);
+        table.setRowSelectionAllowed(true);
+        //Ability to sort by row.
+        table.setAutoCreateRowSorter(true);
+        //Prevent reordering of columns.
+        table.getTableHeader().setReorderingAllowed(false);
+        table.getColumn("Image").setMinWidth(150);
+        scrollPane.setViewportView(table);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.addMouseListener(new MouseAdapter() {
 
             @Override
             public void mouseClicked(MouseEvent e) {
+
                 int selectedRow = table.getSelectedRow();
                 if (selectedRow > -1) {
                     ItemDetailViewController detailVC = new ItemDetailViewController(items.get(selectedRow));
                     ApplicationManager.setDisplayedViewController(detailVC);
                 }
-//                ListSelectionModel cellSelectionModel = table.getSelectionModel();
-//                cellSelectionModel.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-//                cellSelectionModel.addListSelectionListener(new ListSelectionListener() {
-//                    @Override
-//                    public void valueChanged(ListSelectionEvent e) {
-//
-//
-//                    }
-//                });
+                //Get the selected row and clear it when user clicks on product.
+                table.getSelectedRows();
+                table.clearSelection();
             }
         });
     }

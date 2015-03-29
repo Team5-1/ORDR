@@ -319,6 +319,20 @@ public class Item extends SQLObject {
             return bItem;
         }
 
+        public void save() {
+            super.save(new DatabaseManager.SaveOrDeleteCompletionHandler() {
+                @Override
+                public void succeeded() {
+
+                }
+
+                @Override
+                public void failed(SQLException exception) {
+
+                }
+            });
+        }
+
         //SQLObject methods
         @Override
         public Boolean hasChanges() {
