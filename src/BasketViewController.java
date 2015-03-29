@@ -1,12 +1,9 @@
 
 
 import javax.swing.*;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.HashMap;
 
 /**
@@ -14,10 +11,10 @@ import java.util.HashMap;
  */
 public class BasketViewController extends ViewController {
 
-    private JLabel totalValueLabel;
-    private double totalValue = 0.0;
+    private JLabel totalPriceLabel = new JLabel();
+    private double totalPrice = 0.0;
     final private JTable table = new JTable();
-    JLabel storeLabel = new javax.swing.JLabel();
+    JLabel statusLabel = new JLabel();
 
     public BasketViewController() { initComponents(); }
 
@@ -25,24 +22,16 @@ public class BasketViewController extends ViewController {
     private void initComponents() {
 
         //Init table
-        JScrollPane scrollPane = new javax.swing.JScrollPane();
-        JLabel shoppingCartLabel = new javax.swing.JLabel();
-        JLabel totalLabel = new javax.swing.JLabel();
-        totalValueLabel = new javax.swing.JLabel();
-        JButton checkOutButton = new javax.swing.JButton();
-        JButton removeSelectedButton = new javax.swing.JButton();
-        JButton clearCartButton = new javax.swing.JButton();
-        JLabel splitLabel = new javax.swing.JLabel();
-        JButton updateOrder = new javax.swing.JButton();
-
-
-
-        //ALI!!!!!!
-        //LOOK HERE!
-        //TODO
-
-        totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
-        totalValueLabel.setText("£0.00");
+        JScrollPane scrollPane = new JScrollPane();
+        JLabel shoppingCartLabel = new JLabel();
+        JLabel totalLabel = new JLabel();
+        JButton checkOutButton = new JButton();
+        JButton removeSelectedButton = new JButton();
+        JButton clearCartButton = new JButton();
+        JLabel splitLabel = new JLabel();
+        JButton updateOrder = new JButton();
+        totalPriceLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
+        totalPriceLabel.setText("£0.00");
 
 
 
@@ -74,7 +63,7 @@ public class BasketViewController extends ViewController {
                 int totalRows = table.getRowCount();
                 System.out.println(totalRows + "total rows");
 
-                totalValue = 0.0;
+                totalPrice = 0.0;
             }
         });
 
@@ -91,8 +80,8 @@ public class BasketViewController extends ViewController {
 //            public void succeeded(final ArrayList<Item> items) {
 //
 //
-//                totalValueLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
-//                totalValueLabel.setText("£0.00");
+//                totalPriceLabel.setFont(new java.awt.Font("Lucida Grande", 0, 18));
+//                totalPriceLabel.setText("£0.00");
 //
 //                model.addColumn("Name");
 //                model.addColumn("Price");
@@ -102,8 +91,8 @@ public class BasketViewController extends ViewController {
 //                for (int i = 0; i < items.size(); i++) {
 //
 //                    model.addRow(new Object[]{items.get(i).getName(), items.get(i).getPrice(), '1'});
-//                    totalValue = totalValue + items.get(i).getPrice();
-//                    totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+//                    totalPrice = totalPrice + items.get(i).getPrice();
+//                    totalPriceLabel.setText("£" + String.format("%.2f", totalPrice));
 //                }
 //
 //
@@ -143,13 +132,13 @@ public class BasketViewController extends ViewController {
 //                        int totalRows = shoppingCartTable.getRowCount();
 //                        System.out.println(totalRows + "total rows");
 //
-//                        double totalValue = 0.0;
+//                        double totalPrice = 0.0;
 //
 //                        for (int i = 0; i < totalRows; i++) {
 //
-//                            totalValue = totalValue + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * items.get(i).getPrice();
+//                            totalPrice = totalPrice + Integer.parseInt(shoppingCartTable.getValueAt(i, 2).toString()) * items.get(i).getPrice();
 //                        }
-//                        totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+//                        totalPriceLabel.setText("£" + String.format("%.2f", totalPrice));
 //
 //                    }
 //                });
@@ -183,7 +172,7 @@ public class BasketViewController extends ViewController {
 
         removeSelectedButton.setText("Remove Selected Item");
 
-        storeLabel.setFont(new java.awt.Font("Lucida Grande", 0, 30));
+        statusLabel.setFont(new java.awt.Font("Lucida Grande", 0, 30));
 
         clearCartButton.setText("Clear Cart");
 
@@ -203,7 +192,7 @@ public class BasketViewController extends ViewController {
                                                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
                                                                         .addGroup(layout.createSequentialGroup()
                                                                                 .addGap(100, 100, 100)
-                                                                                .addComponent(storeLabel))))
+                                                                                .addComponent(statusLabel))))
                                                         .addComponent(shoppingCartLabel, javax.swing.GroupLayout.PREFERRED_SIZE, 124, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                                                 .addComponent(scrollPane, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -223,7 +212,7 @@ public class BasketViewController extends ViewController {
                                                                                 .addGroup(layout.createSequentialGroup()
                                                                                         .addComponent(totalLabel)
                                                                                         .addGap(1, 1, 1)
-                                                                                        .addComponent(totalValueLabel))))))
+                                                                                        .addComponent(totalPriceLabel))))))
                                                 .addContainerGap(12, Short.MAX_VALUE))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addComponent(splitLabel)
@@ -238,7 +227,7 @@ public class BasketViewController extends ViewController {
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                                         .addComponent(checkOutButton, javax.swing.GroupLayout.PREFERRED_SIZE, 56, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addGroup(layout.createSequentialGroup()
-                                                .addComponent(storeLabel)
+                                                .addComponent(statusLabel)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE))
                                                 .addGap(18, 18, 18)
@@ -261,7 +250,7 @@ public class BasketViewController extends ViewController {
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                                                         .addComponent(totalLabel)
-                                                        .addComponent(totalValueLabel))))
+                                                        .addComponent(totalPriceLabel))))
                                 .addContainerGap(41, Short.MAX_VALUE))
         );
 
@@ -273,24 +262,25 @@ public class BasketViewController extends ViewController {
         tableModel.addColumn("Name");
         tableModel.addColumn("Price");
         tableModel.addColumn("Quantity");
+        table.setModel(tableModel);
         if (User.getCurrentUser() != null) {
             final Runnable showBasket = new Runnable() {
                 @Override
                 public void run() {
                     HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
                     if (basket != null && basket.size() > 0) {
+                        float totalPrice = 0;
                         for (Item.BasketItem bItem : basket.values()) {
-
                             Double itemPrice = bItem.getItem().getPrice();
                             tableModel.addRow(new Object[]{bItem.getItem().getName(), itemPrice, bItem.getQuantity()});
-                            totalValue = totalValue + itemPrice;
-                            totalValueLabel.setText("£" + String.format("%.2f", totalValue));
+                            totalPrice += itemPrice * bItem.getQuantity();
                         }
-                        storeLabel.setText("");
+                        totalPriceLabel.setText("£" + String.format("%.2f", totalPrice));
+                        statusLabel.setText("");
                     } else {
-                        storeLabel.setText("Your basket is empty");
+                        statusLabel.setText("Your basket is empty");
+                        totalPriceLabel.setText("");
                     }
-                    table.setModel(tableModel);
                 }
             };
             User.getCurrentUser().refreshBasketInBackground(new User.BasketRefreshCompletionHandler() {
@@ -302,12 +292,13 @@ public class BasketViewController extends ViewController {
                 @Override
                 public void failed(SQLException exception) {
                     showBasket.run();
-                    storeLabel.setText("Unable to refresh basket");
+                    statusLabel.setText("Unable to refresh basket");
 
                 }
             });
         } else {
-            storeLabel.setText("Please log in to add items to your basket");
+            statusLabel.setText("Please log in to add items to your basket");
+            totalPriceLabel.setText("");
         }
     }
 
