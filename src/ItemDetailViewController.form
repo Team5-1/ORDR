@@ -70,7 +70,6 @@
             <properties>
               <font name="Heiti SC" size="13"/>
               <model>
-                <item value=""/>
                 <item value="1"/>
                 <item value="2"/>
                 <item value="3"/>

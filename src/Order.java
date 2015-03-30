@@ -75,14 +75,11 @@ public class Order extends SQLObject {
                         Runnable callback = new Runnable() {
                             @Override
                             public void run() {
-                                user.emptyBasket(new DatabaseManager.SaveOrDeleteSuccessHandler(exceptionHandler) {
-                                    @Override
-                                    public void succeeded() {
-                                        handler.succeeded(newOrder);
-                                    }
-                                });
+                                user.emptyBasket();
+                                handler.succeeded(newOrder);
                             }
                         };
+
                         BackgroundQueue.addToQueue(new MainRunnableTask(createOrderInstanceAndItems, callback));
                     }
                 });

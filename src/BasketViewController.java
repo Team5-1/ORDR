@@ -1,8 +1,12 @@
 
 
 import javax.swing.*;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,6 +22,7 @@ public class BasketViewController extends ViewController {
     private JLabel statusLabel = new JLabel();
     private DefaultTableModel tableModel;
     private ArrayList<Item.BasketItem> orderedBasket;
+    JButton removeSelectedButton = new JButton();
 
     public BasketViewController() { initComponents(); }
 
@@ -29,7 +34,6 @@ public class BasketViewController extends ViewController {
         JLabel shoppingCartLabel = new JLabel();
         JLabel totalLabel = new JLabel();
         JButton checkOutButton = new JButton();
-        JButton removeSelectedButton = new JButton();
         JButton clearCartButton = new JButton();
         JLabel splitLabel = new JLabel();
         JButton updateOrder = new JButton();
@@ -38,40 +42,48 @@ public class BasketViewController extends ViewController {
 
 
 
-        removeSelectedButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        removeSelectedButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 if (User.getCurrentUser() != null && table.getSelectedRow() > -1) {
                     Item.BasketItem selectedBItem = orderedBasket.get(table.getSelectedRow());
                     User.getCurrentUser().removeItemFromBasket(selectedBItem);
                     orderedBasket.remove(table.getSelectedRow());
                     tableModel.removeRow(table.getSelectedRow());
-                    if (orderedBasket.size() == 0) {
-                        statusLabel.setText("Your basket is empty");
-                    }
+                    if (orderedBasket.size() == 0) statusLabel.setText("Your basket is empty");
                 }
             }
         });
 
-        clearCartButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-
+        clearCartButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (User.getCurrentUser() != null && orderedBasket.size() > 0) {
+                    User.getCurrentUser().emptyBasket();
+                    setNewTableModel();
+                }
             }
         });
 
 
-        updateOrder.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
+        updateOrder.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
                 int totalRows = table.getRowCount();
                 System.out.println(totalRows + "total rows");
                 totalPrice = 0.0;
             }
         });
 
-        checkOutButton.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                checkOutButtonActionPerformed(evt);
+        checkOutButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent evt) {
+                if (User.getCurrentUser() != null) {
+                    HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
+                    if (basket.size() > 0) {
+                        OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
+                        ApplicationManager.setDisplayedViewController(orderVC);
+                    }
+                }
             }
         });
+
 //
 
 //        Item.fetchAllItemsInBackground(new Item.MultipleItemCompletionHandler() {
@@ -258,13 +270,29 @@ public class BasketViewController extends ViewController {
         pack();
     }
 
-    private void refreshTableData() {
-        tableModel = new DefaultTableModel();
+    private void setNewTableModel() {
+        tableModel = new DefaultTableModel() {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return (column == 2);
+            }
+        };
         tableModel.addColumn("Name");
         tableModel.addColumn("Price");
         tableModel.addColumn("Quantity");
         table.setModel(tableModel);
         orderedBasket = new ArrayList<Item.BasketItem>();
+
+        removeSelectedButton.setEnabled(false);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            public void valueChanged(ListSelectionEvent event) {
+                removeSelectedButton.setEnabled((table.getSelectedRow() > -1));
+            }
+        });
+    }
+
+    private void refreshTableData() {
+        setNewTableModel();
 
         if (User.getCurrentUser() != null) {
 
@@ -305,16 +333,6 @@ public class BasketViewController extends ViewController {
         } else {
             statusLabel.setText("Please log in to add items to your basket");
             totalPriceLabel.setText("");
-        }
-    }
-
-    private void checkOutButtonActionPerformed(java.awt.event.ActionEvent evt) {
-        if (User.getCurrentUser() != null) {
-            HashMap<Integer, Item.BasketItem> basket = User.getCurrentUser().getBasket();
-            if (basket.size() > 0) {
-                OrderCompletionViewController orderVC = new OrderCompletionViewController(basket);
-                ApplicationManager.setDisplayedViewController(orderVC);
-            }
         }
     }
 

@@ -202,20 +202,19 @@ public class User extends SQLObject {
         basketItems.remove(bItem.getItem().getID());
     }
 
-    public void emptyBasket(final DatabaseManager.SaveOrDeleteCompletionHandler handler) {
+    public void emptyBasket() {
         DatabaseManager.deleteSQLObjects(basketItems.values(), new DatabaseManager.SaveOrDeleteCompletionHandler() {
             @Override
             public void succeeded() {
-                basketItems = new HashMap<Integer, Item.BasketItem>();
-                handler.succeeded();
+                //TODO
             }
 
             @Override
             public void failed(SQLException exception) {
-                handler.failed(exception);
+                //TODO
             }
         });
-
+        basketItems = new HashMap<Integer, Item.BasketItem>();
     }
 
     public static boolean emailAddressIsValid(String emailAddress) {
