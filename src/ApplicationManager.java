@@ -29,6 +29,7 @@ public class ApplicationManager {
         addViewControllerToNav(new BasketViewController());
         addViewControllerToNav(new ContactForm());
         mainView.add(navView, BorderLayout.NORTH);
+        displayViewControllerAtIndex(2);
         window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         window.setVisible(true);
     }
