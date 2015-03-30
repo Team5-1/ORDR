@@ -66,9 +66,20 @@ public class BasketViewController extends ViewController {
 
         updateOrder.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent evt) {
-                int totalRows = table.getRowCount();
-                System.out.println(totalRows + "total rows");
-                totalPrice = 0.0;
+                if (User.getCurrentUser() != null && orderedBasket.size() > 0) {
+                    int i = 0;
+                    boolean quantityChanged = false;
+                    for (Item.BasketItem bItem : orderedBasket) {
+                        int quantity = Integer.parseInt(table.getValueAt(i, 2).toString());
+                        if (quantity != bItem.getQuantity()) {
+                            bItem.setQuantity(quantity);
+                            bItem.save();
+                            quantityChanged = true;
+                        }
+                        i++;
+                    }
+                    if (quantityChanged) setBasketTotalAndStatus();
+                }
             }
         });
 
@@ -314,6 +325,7 @@ public class BasketViewController extends ViewController {
                         statusLabel.setText("Your basket is empty");
                         totalPriceLabel.setText("");
                     }
+                    setBasketTotalAndStatus();
                 }
             };
 
@@ -326,10 +338,28 @@ public class BasketViewController extends ViewController {
                 @Override
                 public void failed(SQLException exception) {
                     showBasket.run();
-                    statusLabel.setText("Unable to refresh basket");
                 }
             });
 
+        } else {
+            setBasketTotalAndStatus();
+        }
+    }
+
+    private void setBasketTotalAndStatus() {
+        if (User.getCurrentUser() != null) {
+            if (orderedBasket != null && orderedBasket.size() > 0) {
+                float totalPrice = 0;
+                for (Item.BasketItem bItem : orderedBasket) {
+                    Double itemPrice = bItem.getItem().getPrice();
+                    totalPrice += itemPrice * bItem.getQuantity();
+                }
+                totalPriceLabel.setText("£" + String.format("%.2f", totalPrice));
+                statusLabel.setText("");
+            } else {
+                statusLabel.setText("Your basket is empty");
+                totalPriceLabel.setText("");
+            }
         } else {
             statusLabel.setText("Please log in to add items to your basket");
             totalPriceLabel.setText("");
