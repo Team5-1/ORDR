@@ -59,6 +59,7 @@ public class BasketViewController extends ViewController {
                 if (User.getCurrentUser() != null && orderedBasket.size() > 0) {
                     User.getCurrentUser().emptyBasket();
                     setNewTableModel();
+                    setBasketTotalAndStatus();
                 }
             }
         });
