@@ -82,9 +82,11 @@ public class ApplicationManager {
                         displayedViewController.viewWillAppear();
                     }
                 });
+                addViewControllerToNav(new OrderTableViewController(User.getCurrentUser()), 0);
                 navView.add(logOutButton, BorderLayout.NORTH, 0);
             } else {
                 navView.remove(0);
+                removeViewControllerFromNavAtIndex(0);
                 addViewControllerToNav(new LogInViewController(), 0);
                 addViewControllerToNav(new CreateAccountViewController(), 1);
             }

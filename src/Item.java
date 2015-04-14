@@ -425,11 +425,7 @@ public class Item extends SQLObject {
                 public void succeeded(ResultSet results) throws SQLException {
                     ArrayList<OrderItem> orderItems = new ArrayList<OrderItem>();
                     while (results.next()) {
-                        OrderItem ordItem = new OrderItem();
-                        ordItem.ID = results.getInt(kID_COLUMN_NAME);
-                        ordItem.quantity = results.getInt(kQUANTITY_COLUMN_NAME);
-                        ordItem.item = itemFromResultSet(results);
-                        orderItems.add(ordItem);
+                        orderItems.add(makeOrderItemWithResultSet(results));
 
                     }
                     handler.succeeded(orderItems);
@@ -460,6 +456,14 @@ public class Item extends SQLObject {
             insertedID.next();
             OrderItem ordItem = new OrderItem(insertedID.getInt(1), bItem.getItem(), bItem.getQuantity());
             return ordItem;
+        }
+
+        public static OrderItem makeOrderItemWithResultSet(ResultSet results) throws SQLException{
+            OrderItem ordItem = new OrderItem();
+            ordItem.ID = results.getInt(kID_COLUMN_NAME);
+            ordItem.quantity = results.getInt(kQUANTITY_COLUMN_NAME);
+            ordItem.item = itemFromResultSet(results);
+            return  ordItem;
         }
 
         //SQLObject methods

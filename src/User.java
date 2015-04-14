@@ -217,6 +217,7 @@ public class User extends SQLObject {
         basketItems = new HashMap<Integer, Item.BasketItem>();
     }
 
+    //Validation
     public static boolean emailAddressIsValid(String emailAddress) {
         Pattern emailRegex = Pattern.compile("^[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,6}$", Pattern.CASE_INSENSITIVE);
         Matcher matcher = emailRegex.matcher(emailAddress);
